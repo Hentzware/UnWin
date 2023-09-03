@@ -1,0 +1,244 @@
+﻿<Window
+    x:Class="UnWin.Views.ShellView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:prism="http://prismlibrary.com/"
+    Title="ShellView"
+    Width="1000"
+    Height="670"
+    Background="#FF1A1A1D"
+    FontFamily="Calibri"
+    FontSize="14"
+    Foreground="White"
+    ResizeMode="CanMinimize"
+    mc:Ignorable="d">
+    <Window.Resources>
+        <!--  This style is used for buttons, to remove the WPF default 'animated' mouse over effect  -->
+        <Style x:Key="DefaultButtonStyle" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            Name="border"
+                            Padding="4,2"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="DarkGray"
+                            BorderThickness="1"
+                            CornerRadius="3">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="Black" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <StackPanel Margin="10,20,10,10">
+        <StackPanel
+            Height="30"
+            Margin="0,0,0,10"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal">
+            <Label
+                Width="105"
+                HorizontalContentAlignment="Right"
+                VerticalContentAlignment="Center"
+                Content="oscdimg.exe"
+                Foreground="#FFD5D5D5" />
+            <TextBox
+                Width="500"
+                Height="20"
+                Background="#FF191919"
+                Foreground="#FFD5D5D5"
+                IsReadOnly="True"
+                Text="{Binding OscdimgExeDirPath, UpdateSourceTrigger=PropertyChanged}" />
+            <Button
+                Width="100"
+                Height="20"
+                Margin="10,0,0,0"
+                Background="#FF191919"
+                Command="{Binding OpenCommand}"
+                CommandParameter="OscdimgExeDirPath"
+                Content="Öffnen"
+                Foreground="#FFD5D5D5"
+                Style="{StaticResource DefaultButtonStyle}" />
+        </StackPanel>
+        <StackPanel
+            Height="30"
+            Margin="0,0,0,10"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal">
+            <Label
+                Width="105"
+                HorizontalContentAlignment="Right"
+                VerticalContentAlignment="Center"
+                Content="unattend.xml"
+                Foreground="#FFD5D5D5" />
+            <TextBox
+                Width="500"
+                Height="20"
+                Background="#FF191919"
+                Foreground="#FFD5D5D5"
+                IsReadOnly="True"
+                Text="{Binding UnattendXmlPath, UpdateSourceTrigger=PropertyChanged}" />
+            <Button
+                Width="100"
+                Height="20"
+                Margin="10,0,0,0"
+                Background="#FF191919"
+                Command="{Binding OpenCommand}"
+                CommandParameter="UnattendXmlPath"
+                Content="Öffnen"
+                Foreground="#FFD5D5D5"
+                Style="{StaticResource DefaultButtonStyle}" />
+        </StackPanel>
+        <StackPanel
+            Height="30"
+            Margin="0,0,0,10"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal">
+            <Label
+                Width="105"
+                HorizontalContentAlignment="Right"
+                VerticalContentAlignment="Center"
+                Content="Mount Ordner"
+                Foreground="#FFD5D5D5" />
+            <TextBox
+                Width="500"
+                Height="20"
+                Background="#FF191919"
+                Foreground="#FFD5D5D5"
+                IsReadOnly="True"
+                Text="{Binding InstallWimMountDirPath, UpdateSourceTrigger=PropertyChanged}" />
+            <Button
+                Width="100"
+                Height="20"
+                Margin="10,0,0,0"
+                Background="#FF191919"
+                Command="{Binding OpenCommand}"
+                CommandParameter="InstallWimMountDirPath"
+                Content="Öffnen"
+                Foreground="#FFD5D5D5"
+                Style="{StaticResource DefaultButtonStyle}" />
+        </StackPanel>
+        <StackPanel
+            Height="30"
+            Margin="0,0,0,10"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal">
+            <Label
+                Width="105"
+                HorizontalContentAlignment="Right"
+                VerticalContentAlignment="Center"
+                Content="Quell Iso"
+                Foreground="#FFD5D5D5" />
+            <TextBox
+                Width="500"
+                Height="20"
+                Background="#FF191919"
+                Foreground="#FFD5D5D5"
+                IsReadOnly="True"
+                Text="{Binding SourceIsoPath, UpdateSourceTrigger=PropertyChanged}" />
+            <Button
+                Width="100"
+                Height="20"
+                Margin="10,0,0,0"
+                Background="#FF191919"
+                Command="{Binding OpenCommand}"
+                CommandParameter="SourceIsoPath"
+                Content="Öffnen"
+                Foreground="#FFD5D5D5"
+                Style="{StaticResource DefaultButtonStyle}" />
+        </StackPanel>
+        <StackPanel
+            Height="30"
+            Margin="0,0,0,10"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal">
+            <Label
+                Width="105"
+                HorizontalContentAlignment="Right"
+                VerticalContentAlignment="Center"
+                Content="Quell Iso Ordner"
+                Foreground="#FFD5D5D5" />
+            <TextBox
+                Width="500"
+                Height="20"
+                Background="#FF191919"
+                Foreground="#FFD5D5D5"
+                IsReadOnly="True"
+                Text="{Binding SourceIsoDirPath, UpdateSourceTrigger=PropertyChanged}" />
+            <Button
+                Width="100"
+                Height="20"
+                Margin="10,0,0,0"
+                Background="#FF191919"
+                Command="{Binding OpenCommand}"
+                CommandParameter="SourceIsoDirPath"
+                Content="Öffnen"
+                Foreground="#FFD5D5D5"
+                Style="{StaticResource DefaultButtonStyle}" />
+        </StackPanel>
+        <StackPanel
+            Height="30"
+            Margin="0,0,0,20"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal">
+            <Label
+                Width="105"
+                HorizontalContentAlignment="Right"
+                VerticalContentAlignment="Center"
+                Content="Ziel Iso"
+                Foreground="#FFD5D5D5" />
+            <TextBox
+                Width="500"
+                Height="20"
+                Background="#FF191919"
+                Foreground="#FFD5D5D5"
+                IsReadOnly="True"
+                Text="{Binding TargetIsoPath, UpdateSourceTrigger=PropertyChanged}" />
+            <Button
+                Width="100"
+                Height="20"
+                Margin="10,0,0,0"
+                Background="#FF191919"
+                Command="{Binding OpenCommand}"
+                CommandParameter="TargetIsoPath"
+                Content="Öffnen"
+                Foreground="#FFD5D5D5"
+                Style="{StaticResource DefaultButtonStyle}" />
+        </StackPanel>
+        <Button
+            Width="200"
+            Height="30"
+            Margin="0,0,0,20"
+            Background="#FF191919"
+            Command="{Binding CreateCommand}"
+            Content="Erstelle Image"
+            Foreground="#FFD5D5D5"
+            Style="{StaticResource DefaultButtonStyle}" />
+        <TextBox
+            x:Name="Log"
+            Height="300"
+            Background="#FF191919"
+            Foreground="#FFD5D5D5"
+            IsReadOnly="True"
+            Text="{Binding Log, UpdateSourceTrigger=PropertyChanged}"
+            VerticalScrollBarVisibility="Auto">
+            <b:Interaction.Triggers>
+                <b:EventTrigger EventName="TextChanged">
+                    <prism:InvokeCommandAction Command="{Binding OnTextChanged}" CommandParameter="{x:Reference Log}" />
+                </b:EventTrigger>
+            </b:Interaction.Triggers>
+        </TextBox>
+    </StackPanel>
+</Window>
