@@ -50,18 +50,6 @@ namespace UnWin.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string InstallWimMountDirPath {
-            get {
-                return ((string)(this["InstallWimMountDirPath"]));
-            }
-            set {
-                this["InstallWimMountDirPath"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string OscdimgExeDirPath {
             get {
                 return ((string)(this["OscdimgExeDirPath"]));

@@ -19,20 +19,17 @@ public class ShellViewModel : BindableBase
     private DelegateCommand<string> _openCommand;
     private DelegateCommand<TextBox> _onTextChanged;
     private string _efisysBinPath;
-    private string _installWimMountDirPath;
-    private string _installWimPath;
+    private string _etfsbootComPath;
     private string _log;
     private string _oscdimgExeDirPath;
     private string _sourceIsoDirPath;
     private string _sourceIsoPath;
     private string _targetIsoPath;
     private string _unattendXmlPath;
-    private string _etfsbootComPath;
 
     public ShellViewModel()
     {
         TargetIsoPath = Settings.Default.TargetIsoPath;
-        InstallWimMountDirPath = Settings.Default.InstallWimMountDirPath;
         UnattendXmlPath = Settings.Default.UnattendXmlPath;
         OscdimgExeDirPath = Settings.Default.OscdimgExeDirPath;
         SourceIsoPath = Settings.Default.SourceIsoPath;
@@ -42,23 +39,11 @@ public class ShellViewModel : BindableBase
     public DelegateCommand CreateCommand =>
         _createCommand ?? new DelegateCommand(ExecuteCreateCommand);
 
-    public DelegateCommand<TextBox> OnTextChanged =>
-        _onTextChanged ?? new DelegateCommand<TextBox>(ExecuteOnTextChanged);
-
     public DelegateCommand<string> OpenCommand =>
         _openCommand ?? new DelegateCommand<string>(ExecuteOpenCommand);
 
-    public string InstallWimMountDirPath
-    {
-        get => _installWimMountDirPath;
-        set
-        {
-            SetProperty(ref _installWimMountDirPath, value);
-            Settings.Default.InstallWimMountDirPath = value;
-            Settings.Default.Save();
-            RaisePropertyChanged();
-        }
-    }
+    public DelegateCommand<TextBox> OnTextChanged =>
+        _onTextChanged ?? new DelegateCommand<TextBox>(ExecuteOnTextChanged);
 
     public string Log
     {
@@ -130,59 +115,62 @@ public class ShellViewModel : BindableBase
         }
     }
 
-    private async Task CleanupWim()
+    private string SaveFile(SaveFileDialog saveFileDialog)
     {
-        var cmd = new ProcessStartInfo("cmd.exe")
-        {
-            RedirectStandardInput = true,
-            RedirectStandardOutput = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
+        if (saveFileDialog.ShowDialog() == true) return saveFileDialog.FileName;
 
-        using var process = new Process { StartInfo = cmd, EnableRaisingEvents = true };
-
-        process.OutputDataReceived += (sender, e) =>
-        {
-            if (e.Data != null)
-            {
-                Log += e.Data + "\n";
-            }
-        };
-
-        process.Start();
-
-        using (var streamWriter = process.StandardInput)
-        {
-            if (streamWriter.BaseStream.CanWrite)
-            {
-                streamWriter.WriteLine($"Dism /Cleanup-Wim");
-            }
-        }
-
-        process.BeginOutputReadLine();
-        await process.WaitForExitAsync();
-
-        if (!process.HasExited)
-        {
-            process.Kill();
-        }
-
+        return string.Empty;
     }
 
-    private void ApplyUnattend()
+    private string SelectFile(OpenFileDialog openFileDialog)
     {
-        var xml3 = Path.Combine(_sourceIsoDirPath, "autounattend.xml");
+        if (openFileDialog.ShowDialog() == true) return openFileDialog.FileName;
 
-        if (File.Exists(xml3))
-        {
-            File.Delete(xml3);
-        }
+        return string.Empty;
+    }
 
-        File.Copy(_unattendXmlPath, xml3);
+    private string SelectFolder(VistaFolderBrowserDialog openFolderDialog)
+    {
+        if (openFolderDialog.ShowDialog() == true) return openFolderDialog.SelectedPath;
+
+        return "";
     }
 
     private async Task CreateImage()
+    {
+        await RunCommand($"oscdimg.exe -m -o -h -u2 -udfver102 -b\"{_efisysBinPath}\" -pEF \"{_sourceIsoDirPath}\" \"{_targetIsoPath}\"");
+    }
+
+    private async Task ExtractDirectory(DiscDirectoryInfo directory, string outputPath)
+    {
+        foreach (var file in directory.GetFiles())
+        {
+            var newFilePath = Path.Combine(outputPath, file.Name);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(newFilePath));
+
+            using (var fileStream = file.OpenRead())
+
+            using (var outputStream = File.Create(newFilePath))
+            {
+                Log += $"Kopiere {file.Name}" + "\n";
+                await fileStream.CopyToAsync(outputStream);
+            }
+        }
+
+        foreach (var dir in directory.GetDirectories()) await ExtractDirectory(dir, Path.Combine(outputPath, dir.Name));
+    }
+
+    private async Task ExtractIso()
+    {
+        using (var isoStream = File.OpenRead(_sourceIsoPath))
+        {
+            var udf = new UdfReader(isoStream);
+            await ExtractDirectory(udf.Root, _sourceIsoDirPath);
+        }
+    }
+
+    private async Task RunCommand(string command)
     {
         var cmd = new ProcessStartInfo("cmd.exe")
         {
@@ -197,93 +185,40 @@ public class ShellViewModel : BindableBase
 
         process.OutputDataReceived += (sender, e) =>
         {
-            if (e.Data != null)
-            {
-                Log += e.Data + "\n";
-            }
+            if (e.Data != null) Log += e.Data + "\n";
         };
 
         process.Start();
 
         using (var streamWriter = process.StandardInput)
         {
-            if (streamWriter.BaseStream.CanWrite)
-            {
-                streamWriter.WriteLine($"oscdimg.exe -m -o -h -u2 -udfver102 -b{_efisysBinPath} -pEF {_sourceIsoDirPath} {_targetIsoPath}");
-                //streamWriter.WriteLine($"oscdimg.exe -m -o -u2 -udfver102 -h -b{_efisysBinPath} -pEF {_sourceIsoDirPath} {_targetIsoPath}");
-                //streamWriter.WriteLine($"oscdimg.exe -m -o -h -b{_efisysBinPath} -pEF {_sourceIsoDirPath} {_targetIsoPath}");
-                //streamWriter.WriteLine($"oscdimg.exe -m -o -h -u2 -bootdata:2#p0,e,b{_etfsbootComPath}#pEF,e,b{_efisysBinPath} {_sourceIsoDirPath} {_targetIsoPath}");
-                //streamWriter.WriteLine($"oscdimg.exe -m -o -u2 -udfver102 -h -bootdata:2#p0,e,b{_etfsbootComPath}#pEF,e,b{_efisysBinPath} {_sourceIsoDirPath} {_targetIsoPath}");
-            }
+            if (streamWriter.BaseStream.CanWrite) streamWriter.WriteLine(command);
         }
 
         process.BeginOutputReadLine();
+
         await process.WaitForExitAsync();
 
-        if (!process.HasExited)
-        {
-            process.Kill();
-        }
+        if (!process.HasExited) process.Kill();
+    }
+
+    private void ApplyUnattend()
+    {
+        var xml3 = Path.Combine(_sourceIsoDirPath, "autounattend.xml");
+
+        if (File.Exists(xml3)) File.Delete(xml3);
+
+        File.Copy(_unattendXmlPath, xml3);
     }
 
     private async void ExecuteCreateCommand()
     {
-        //await CleanupWim();
+        if (Directory.GetFiles(_sourceIsoDirPath).Length == 0) await ExtractIso();
 
-        if (Directory.GetFiles(_sourceIsoDirPath).Length == 0)
-        {
-            await ExtractIso();
-        }
-        
         SearchFiles();
         RemoveBootPrompt();
-        //await MountFolder();
         ApplyUnattend();
-        //await UnmountFolder();
         await CreateImage();
-    }
-
-    private void RemoveBootPrompt()
-    {
-        var cdbootEfiPrompt = Directory.GetFiles(_sourceIsoDirPath, "cdboot_prompt.efi", SearchOption.AllDirectories).FirstOrDefault();
-        var cdbootEfi = Directory.GetFiles(_sourceIsoDirPath, "cdboot.efi", SearchOption.AllDirectories).FirstOrDefault();
-        var cdbootEfiNoPrompt = Directory.GetFiles(_sourceIsoDirPath, "cdboot_noprompt.efi", SearchOption.AllDirectories).FirstOrDefault();
-        var efisysBin = Directory.GetFiles(_sourceIsoDirPath, "efisys.bin", SearchOption.AllDirectories).FirstOrDefault();
-        var efisysBinNoPrompt = Directory.GetFiles(_sourceIsoDirPath, "efisys_noprompt.bin", SearchOption.AllDirectories).FirstOrDefault();
-        var directory = cdbootEfi.Replace("cdboot.efi", "");
-
-
-        if (!string.IsNullOrEmpty(cdbootEfiPrompt))
-        {
-            return;
-        }
-
-        if (!string.IsNullOrEmpty(cdbootEfi))
-        {
-            File.Move(cdbootEfi, $"{directory}cdboot_prompt.efi");
-        }
-
-        if (!string.IsNullOrEmpty(cdbootEfiNoPrompt))
-        {
-            File.Move(cdbootEfiNoPrompt, $"{directory}cdboot.efi");
-        }
-
-        if (!string.IsNullOrEmpty(efisysBin))
-        {
-            File.Move(efisysBin, $"{directory}efisys_prompt.bin");
-        }
-
-        if (!string.IsNullOrEmpty(efisysBinNoPrompt))
-        {
-            File.Move(efisysBinNoPrompt, $"{directory}efisys.bin");
-        }
-    }
-
-    private void SearchFiles()
-    {
-        _installWimPath = Directory.GetFiles(_sourceIsoDirPath, "install.wim", SearchOption.AllDirectories).First();
-        _efisysBinPath = Directory.GetFiles(_sourceIsoDirPath, "efisys.bin", SearchOption.AllDirectories).First();
-        _etfsbootComPath = Directory.GetFiles(_sourceIsoDirPath, "etfsboot.com", SearchOption.AllDirectories).First();
     }
 
     private void ExecuteOnTextChanged(TextBox textBox)
@@ -308,10 +243,6 @@ public class ShellViewModel : BindableBase
                 UnattendXmlPath = SelectFile(openFileDialog);
                 break;
 
-            case nameof(InstallWimMountDirPath):
-                InstallWimMountDirPath = SelectFolder(openFolderDialog);
-                break;
-
             case nameof(SourceIsoPath):
                 openFileDialog.Filter = "ISO|*.iso";
                 SourceIsoPath = SelectFile(openFileDialog);
@@ -328,143 +259,35 @@ public class ShellViewModel : BindableBase
         }
     }
 
-    private async Task ExtractIso()
+    private void RemoveBootPrompt()
     {
-        using (FileStream isoStream = File.OpenRead(_sourceIsoPath))
-        {
-            UdfReader udf = new UdfReader(isoStream);
-            await ExtractDirectory(udf.Root, _sourceIsoDirPath);
-        }
+        var cdbootEfiPrompt = Directory.GetFiles(_sourceIsoDirPath, "cdboot_prompt.efi", SearchOption.AllDirectories)
+            .FirstOrDefault();
+        var cdbootEfi = Directory.GetFiles(_sourceIsoDirPath, "cdboot.efi", SearchOption.AllDirectories)
+            .FirstOrDefault();
+        var cdbootEfiNoPrompt = Directory
+            .GetFiles(_sourceIsoDirPath, "cdboot_noprompt.efi", SearchOption.AllDirectories).FirstOrDefault();
+        var efisysBin = Directory.GetFiles(_sourceIsoDirPath, "efisys.bin", SearchOption.AllDirectories)
+            .FirstOrDefault();
+        var efisysBinNoPrompt = Directory
+            .GetFiles(_sourceIsoDirPath, "efisys_noprompt.bin", SearchOption.AllDirectories).FirstOrDefault();
+        var directory = cdbootEfi.Replace("cdboot.efi", "");
+
+
+        if (!string.IsNullOrEmpty(cdbootEfiPrompt)) return;
+
+        if (!string.IsNullOrEmpty(cdbootEfi)) File.Move(cdbootEfi, $"{directory}cdboot_prompt.efi");
+
+        if (!string.IsNullOrEmpty(cdbootEfiNoPrompt)) File.Move(cdbootEfiNoPrompt, $"{directory}cdboot.efi");
+
+        if (!string.IsNullOrEmpty(efisysBin)) File.Move(efisysBin, $"{directory}efisys_prompt.bin");
+
+        if (!string.IsNullOrEmpty(efisysBinNoPrompt)) File.Move(efisysBinNoPrompt, $"{directory}efisys.bin");
     }
 
-    private async Task ExtractDirectory(DiscDirectoryInfo directory, string outputPath)
+    private void SearchFiles()
     {
-        foreach (var file in directory.GetFiles())
-        {
-            string newFilePath = Path.Combine(outputPath, file.Name);
-
-            Directory.CreateDirectory(Path.GetDirectoryName(newFilePath));
-
-            using (Stream fileStream = file.OpenRead())
-
-            using (FileStream outputStream = File.Create(newFilePath))
-            {
-                Log += $"Kopiere {file.Name}" + "\n";
-                await fileStream.CopyToAsync(outputStream);
-            }
-        }
-
-        foreach (var dir in directory.GetDirectories())
-        {
-            await ExtractDirectory(dir, Path.Combine(outputPath, dir.Name));
-        }
-    }
-
-    private async Task MountFolder()
-    {
-        var cmd = new ProcessStartInfo("cmd.exe")
-        {
-            RedirectStandardInput = true,
-            RedirectStandardOutput = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
-
-        using var process = new Process { StartInfo = cmd, EnableRaisingEvents = true };
-
-        process.OutputDataReceived += (sender, e) =>
-        {
-            if (e.Data != null)
-            {
-                Log += e.Data + "\n";
-            }
-        };
-
-        process.Start();
-
-        using (var streamWriter = process.StandardInput)
-        {
-            if (streamWriter.BaseStream.CanWrite)
-            {
-                streamWriter.WriteLine($"Dism /Mount-Image /ImageFile:{_installWimPath} /Index:1 /MountDir:{_installWimMountDirPath}");
-            }
-        }
-
-        process.BeginOutputReadLine();
-        await process.WaitForExitAsync();
-
-        if (!process.HasExited)
-        {
-            process.Kill();
-        }
-    }
-
-    private string SaveFile(SaveFileDialog saveFileDialog)
-    {
-        if (saveFileDialog.ShowDialog() == true)
-        {
-            return saveFileDialog.FileName;
-        }
-
-        return string.Empty;
-    }
-
-    private string SelectFile(OpenFileDialog openFileDialog)
-    {
-        if (openFileDialog.ShowDialog() == true)
-        {
-            return openFileDialog.FileName;
-        }
-
-        return string.Empty;
-    }
-
-    private string SelectFolder(VistaFolderBrowserDialog openFolderDialog)
-    {
-        if (openFolderDialog.ShowDialog() == true)
-        {
-            return openFolderDialog.SelectedPath;
-        }
-
-        return "";
-    }
-
-    private async Task UnmountFolder()
-    {
-        var cmd = new ProcessStartInfo("cmd.exe")
-        {
-            RedirectStandardInput = true,
-            RedirectStandardOutput = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
-
-        using var process = new Process { StartInfo = cmd, EnableRaisingEvents = true };
-
-        process.OutputDataReceived += (sender, e) =>
-        {
-            if (e.Data != null)
-            {
-                Log += e.Data + "\n";
-            }
-        };
-
-        process.Start();
-
-        using (var streamWriter = process.StandardInput)
-        {
-            if (streamWriter.BaseStream.CanWrite)
-            {
-                streamWriter.WriteLine($"Dism /Unmount-Image /MountDir:{_installWimMountDirPath} /Commit");
-            }
-        }
-
-        process.BeginOutputReadLine();
-        await process.WaitForExitAsync();
-
-        if (!process.HasExited)
-        {
-            process.Kill();
-        }
+        _efisysBinPath = Directory.GetFiles(_sourceIsoDirPath, "efisys.bin", SearchOption.AllDirectories).First();
+        _etfsbootComPath = Directory.GetFiles(_sourceIsoDirPath, "etfsboot.com", SearchOption.AllDirectories).First();
     }
 }

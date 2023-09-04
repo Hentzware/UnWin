@@ -8,7 +8,7 @@
     xmlns:prism="http://prismlibrary.com/"
     Title="ShellView"
     Width="1000"
-    Height="670"
+    Height="710"
     Background="#FF1A1A1D"
     FontFamily="Calibri"
     FontSize="14"
@@ -49,7 +49,7 @@
             HorizontalAlignment="Center"
             Orientation="Horizontal">
             <Label
-                Width="105"
+                Width="200"
                 HorizontalContentAlignment="Right"
                 VerticalContentAlignment="Center"
                 Content="oscdimg.exe"
@@ -78,7 +78,7 @@
             HorizontalAlignment="Center"
             Orientation="Horizontal">
             <Label
-                Width="105"
+                Width="200"
                 HorizontalContentAlignment="Right"
                 VerticalContentAlignment="Center"
                 Content="unattend.xml"
@@ -103,30 +103,25 @@
         </StackPanel>
         <StackPanel
             Height="30"
-            Margin="0,0,0,10"
-            HorizontalAlignment="Center"
-            Orientation="Horizontal">
+            Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
             <Label
-                Width="105"
+                Width="200"
                 HorizontalContentAlignment="Right"
                 VerticalContentAlignment="Center"
-                Content="Mount Ordner"
+                Content="unattend Modus"
                 Foreground="#FFD5D5D5" />
-            <TextBox
-                Width="500"
-                Height="20"
-                Background="#FF191919"
-                Foreground="#FFD5D5D5"
-                IsReadOnly="True"
-                Text="{Binding InstallWimMountDirPath, UpdateSourceTrigger=PropertyChanged}" />
+            <ComboBox Width="500" Height="20" SelectedIndex="0">
+                <ComboBoxItem Content="Benutzerdefinierte unattend.xml"/>
+                <ComboBoxItem Content="Konfiguration"/>
+            </ComboBox>
             <Button
                 Width="100"
                 Height="20"
                 Margin="10,0,0,0"
                 Background="#FF191919"
                 Command="{Binding OpenCommand}"
-                CommandParameter="InstallWimMountDirPath"
-                Content="Öffnen"
+                CommandParameter="UnattendXmlPath"
+                Content="Konfiguration"
                 Foreground="#FFD5D5D5"
                 Style="{StaticResource DefaultButtonStyle}" />
         </StackPanel>
@@ -136,7 +131,7 @@
             HorizontalAlignment="Center"
             Orientation="Horizontal">
             <Label
-                Width="105"
+                Width="200"
                 HorizontalContentAlignment="Right"
                 VerticalContentAlignment="Center"
                 Content="Quell Iso"
@@ -165,28 +160,29 @@
             HorizontalAlignment="Center"
             Orientation="Horizontal">
             <Label
-                Width="105"
+                Width="200"
                 HorizontalContentAlignment="Right"
                 VerticalContentAlignment="Center"
-                Content="Quell Iso Ordner"
+                Content="Aktion bei vorhandenen Dateien"
                 Foreground="#FFD5D5D5" />
-            <TextBox
-                Width="500"
-                Height="20"
-                Background="#FF191919"
-                Foreground="#FFD5D5D5"
-                IsReadOnly="True"
-                Text="{Binding SourceIsoDirPath, UpdateSourceTrigger=PropertyChanged}" />
-            <Button
-                Width="100"
-                Height="20"
-                Margin="10,0,0,0"
-                Background="#FF191919"
-                Command="{Binding OpenCommand}"
-                CommandParameter="SourceIsoDirPath"
-                Content="Öffnen"
-                Foreground="#FFD5D5D5"
-                Style="{StaticResource DefaultButtonStyle}" />
+            <ComboBox Width="500" Height="20" SelectedIndex="0" Margin="0,0,110,0">
+                <ComboBoxItem Content="Löschen und neu erstellen"/>
+                <ComboBoxItem Content="Vorhandenen Dateien verwenden"/>
+            </ComboBox>
+        </StackPanel>
+        <StackPanel
+            Height="30"
+            Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+            <Label
+                Width="200"
+                HorizontalContentAlignment="Right"
+                VerticalContentAlignment="Center"
+                Content="Aktion nach dem extrahieren"
+                Foreground="#FFD5D5D5" />
+            <ComboBox Width="500" Height="20" SelectedIndex="0" Margin="0,0,110,0">
+                <ComboBoxItem Content="Dateien löschen"/>
+                <ComboBoxItem Content="Dateien behalten"/>
+            </ComboBox>
         </StackPanel>
         <StackPanel
             Height="30"
@@ -194,7 +190,7 @@
             HorizontalAlignment="Center"
             Orientation="Horizontal">
             <Label
-                Width="105"
+                Width="200"
                 HorizontalContentAlignment="Right"
                 VerticalContentAlignment="Center"
                 Content="Ziel Iso"

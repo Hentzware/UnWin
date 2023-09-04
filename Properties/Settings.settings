@@ -8,9 +8,6 @@
     <Setting Name="TargetIsoPath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="InstallWimMountDirPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="OscdimgExeDirPath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>

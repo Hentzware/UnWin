@@ -8,7 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="PubSubEvents\" />
+    <Compile Remove="PubSubEvents\**" />
+    <EmbeddedResource Remove="PubSubEvents\**" />
+    <None Remove="PubSubEvents\**" />
+    <Page Remove="PubSubEvents\**" />
   </ItemGroup>
 
   <ItemGroup>
