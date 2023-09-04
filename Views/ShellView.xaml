@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:prism="http://prismlibrary.com/"
-    Title="ShellView"
+    Title="UnWin Beta 1.0 - Henning Entz FIAE 12 Damago Berlin"
     Width="1000"
     Height="710"
     Background="#FF1A1A1D"
@@ -101,30 +101,7 @@
                 Foreground="#FFD5D5D5"
                 Style="{StaticResource DefaultButtonStyle}" />
         </StackPanel>
-        <StackPanel
-            Height="30"
-            Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
-            <Label
-                Width="200"
-                HorizontalContentAlignment="Right"
-                VerticalContentAlignment="Center"
-                Content="unattend Modus"
-                Foreground="#FFD5D5D5" />
-            <ComboBox Width="500" Height="20" SelectedIndex="0">
-                <ComboBoxItem Content="Benutzerdefinierte unattend.xml"/>
-                <ComboBoxItem Content="Konfiguration"/>
-            </ComboBox>
-            <Button
-                Width="100"
-                Height="20"
-                Margin="10,0,0,0"
-                Background="#FF191919"
-                Command="{Binding OpenCommand}"
-                CommandParameter="UnattendXmlPath"
-                Content="Konfiguration"
-                Foreground="#FFD5D5D5"
-                Style="{StaticResource DefaultButtonStyle}" />
-        </StackPanel>
+
         <StackPanel
             Height="30"
             Margin="0,0,0,10"
@@ -163,25 +140,64 @@
                 Width="200"
                 HorizontalContentAlignment="Right"
                 VerticalContentAlignment="Center"
+                Content="Quell Iso Ordner"
+                Foreground="#FFD5D5D5" />
+            <TextBox
+                Width="500"
+                Height="20"
+                Background="#FF191919"
+                Foreground="#FFD5D5D5"
+                IsReadOnly="True"
+                Text="{Binding SourceIsoDirPath, UpdateSourceTrigger=PropertyChanged}" />
+            <Button
+                Width="100"
+                Height="20"
+                Margin="10,0,0,0"
+                Background="#FF191919"
+                Command="{Binding OpenCommand}"
+                CommandParameter="SourceIsoDirPath"
+                Content="Öffnen"
+                Foreground="#FFD5D5D5"
+                Style="{StaticResource DefaultButtonStyle}" />
+        </StackPanel>
+        <StackPanel
+            Height="30"
+            Margin="0,0,0,10"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal">
+            <Label
+                Width="200"
+                HorizontalContentAlignment="Right"
+                VerticalContentAlignment="Center"
                 Content="Aktion bei vorhandenen Dateien"
                 Foreground="#FFD5D5D5" />
-            <ComboBox Width="500" Height="20" SelectedIndex="0" Margin="0,0,110,0">
-                <ComboBoxItem Content="Löschen und neu erstellen"/>
-                <ComboBoxItem Content="Vorhandenen Dateien verwenden"/>
+            <ComboBox
+                Width="500"
+                Height="20"
+                Margin="0,0,110,0"
+                SelectedIndex="0">
+                <ComboBoxItem Content="Löschen und neu erstellen" />
+                <ComboBoxItem Content="Vorhandenen Dateien verwenden" />
             </ComboBox>
         </StackPanel>
         <StackPanel
             Height="30"
-            Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+            Margin="0,0,0,10"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal">
             <Label
                 Width="200"
                 HorizontalContentAlignment="Right"
                 VerticalContentAlignment="Center"
                 Content="Aktion nach dem extrahieren"
                 Foreground="#FFD5D5D5" />
-            <ComboBox Width="500" Height="20" SelectedIndex="0" Margin="0,0,110,0">
-                <ComboBoxItem Content="Dateien löschen"/>
-                <ComboBoxItem Content="Dateien behalten"/>
+            <ComboBox
+                Width="500"
+                Height="20"
+                Margin="0,0,110,0"
+                SelectedIndex="0">
+                <ComboBoxItem Content="Dateien löschen" />
+                <ComboBoxItem Content="Dateien behalten" />
             </ComboBox>
         </StackPanel>
         <StackPanel

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using DiscUtils;
@@ -163,6 +164,11 @@ public class ShellViewModel : BindableBase
 
     private async Task ExtractIso()
     {
+        if (Directory.GetFiles(_sourceIsoDirPath).Length > 0)
+        {
+            return;
+        }
+
         using (var isoStream = File.OpenRead(_sourceIsoPath))
         {
             var udf = new UdfReader(isoStream);
@@ -213,8 +219,7 @@ public class ShellViewModel : BindableBase
 
     private async void ExecuteCreateCommand()
     {
-        if (Directory.GetFiles(_sourceIsoDirPath).Length == 0) await ExtractIso();
-
+        await ExtractIso();
         SearchFiles();
         RemoveBootPrompt();
         ApplyUnattend();
