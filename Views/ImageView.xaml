@@ -36,193 +36,220 @@
             </Setter>
         </Style>
     </UserControl.Resources>
-    <StackPanel Margin="10,20,10,10">
-        <StackPanel
-            Height="30"
-            Margin="0,0,0,10"
-            HorizontalAlignment="Center"
-            Orientation="Horizontal">
-            <Label
-                Width="100"
-                HorizontalContentAlignment="Right"
-                VerticalContentAlignment="Center"
-                Content="oscdimg.exe"
-                Foreground="#FFD5D5D5" />
-            <TextBox
-                Width="500"
-                Height="20"
-                Background="#FF191919"
-                Foreground="#FFD5D5D5"
-                IsReadOnly="True"
-                Text="{Binding OscdimgExeDirPath, UpdateSourceTrigger=PropertyChanged}" />
-            <Button
-                Width="100"
-                Height="20"
-                Margin="10,0,0,0"
-                Background="#FF191919"
-                Command="{Binding OpenCommand}"
-                CommandParameter="OscdimgExeDirPath"
-                Content="Öffnen"
-                Foreground="#FFD5D5D5"
-                Style="{StaticResource DefaultButtonStyle}" />
-        </StackPanel>
-        <StackPanel
-            Height="30"
-            Margin="0,0,0,10"
-            HorizontalAlignment="Center"
-            Orientation="Horizontal">
-            <Label
-                Width="100"
-                HorizontalContentAlignment="Right"
-                VerticalContentAlignment="Center"
-                Content="unattend.xml"
-                Foreground="#FFD5D5D5" />
-            <TextBox
-                Width="500"
-                Height="20"
-                Background="#FF191919"
-                Foreground="#FFD5D5D5"
-                IsReadOnly="True"
-                Text="{Binding UnattendXmlPath, UpdateSourceTrigger=PropertyChanged}" />
-            <Button
-                Width="100"
-                Height="20"
-                Margin="10,0,0,0"
-                Background="#FF191919"
-                Command="{Binding OpenCommand}"
-                CommandParameter="UnattendXmlPath"
-                Content="Öffnen"
-                Foreground="#FFD5D5D5"
-                Style="{StaticResource DefaultButtonStyle}" />
-        </StackPanel>
-        <StackPanel
-            Height="30"
-            Margin="0,0,0,10"
-            HorizontalAlignment="Center"
-            Orientation="Horizontal">
-            <Label
-                Width="100"
-                HorizontalContentAlignment="Right"
-                VerticalContentAlignment="Center"
-                Content="unattend.xml"
-                Foreground="#FFD5D5D5" />
-            <ComboBox
-                Width="500"
-                Height="20"
-                SelectedIndex="0">
-                <ComboBoxItem Content="Datei Importieren" />
-                <ComboBoxItem Content="Konfiguration benutzen" />
-            </ComboBox>
-            <Button
-                Width="100"
-                Height="20"
-                Margin="10,0,0,0"
-                Background="#FF191919"
-                Command="{Binding OpenUnattendConfigCommand}"
-                Content="Konfiguration"
-                Foreground="#FFD5D5D5"
-                Style="{StaticResource DefaultButtonStyle}" />
-        </StackPanel>
+    <Grid Margin="10,20,10,20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="200" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="200" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-        <StackPanel
-            Height="30"
-            Margin="0,0,0,10"
-            HorizontalAlignment="Center"
-            Orientation="Horizontal">
-            <Label
-                Width="100"
-                HorizontalContentAlignment="Right"
-                VerticalContentAlignment="Center"
-                Content="Quell Iso"
-                Foreground="#FFD5D5D5" />
-            <TextBox
-                Width="500"
-                Height="20"
-                Background="#FF191919"
-                Foreground="#FFD5D5D5"
-                IsReadOnly="True"
-                Text="{Binding SourceIsoPath, UpdateSourceTrigger=PropertyChanged}" />
-            <Button
-                Width="100"
-                Height="20"
-                Margin="10,0,0,0"
-                Background="#FF191919"
-                Command="{Binding OpenCommand}"
-                CommandParameter="SourceIsoPath"
-                Content="Öffnen"
-                Foreground="#FFD5D5D5"
-                Style="{StaticResource DefaultButtonStyle}" />
-        </StackPanel>
-        <StackPanel
-            Height="30"
-            Margin="0,0,0,10"
-            HorizontalAlignment="Center"
-            Orientation="Horizontal">
-            <Label
-                Width="100"
-                HorizontalContentAlignment="Right"
-                VerticalContentAlignment="Center"
-                Content="Quell Iso Ordner"
-                Foreground="#FFD5D5D5" />
-            <TextBox
-                Width="500"
-                Height="20"
-                Background="#FF191919"
-                Foreground="#FFD5D5D5"
-                IsReadOnly="True"
-                Text="{Binding SourceIsoDirPath, UpdateSourceTrigger=PropertyChanged}" />
-            <Button
-                Width="100"
-                Height="20"
-                Margin="10,0,0,0"
-                Background="#FF191919"
-                Command="{Binding OpenCommand}"
-                CommandParameter="SourceIsoDirPath"
-                Content="Öffnen"
-                Foreground="#FFD5D5D5"
-                Style="{StaticResource DefaultButtonStyle}" />
-        </StackPanel>
-        <StackPanel
-            Height="30"
-            Margin="0,0,0,20"
-            HorizontalAlignment="Center"
-            Orientation="Horizontal">
-            <Label
-                Width="100"
-                HorizontalContentAlignment="Right"
-                VerticalContentAlignment="Center"
-                Content="Ziel Iso"
-                Foreground="#FFD5D5D5" />
-            <TextBox
-                Width="500"
-                Height="20"
-                Background="#FF191919"
-                Foreground="#FFD5D5D5"
-                IsReadOnly="True"
-                Text="{Binding TargetIsoPath, UpdateSourceTrigger=PropertyChanged}" />
-            <Button
-                Width="100"
-                Height="20"
-                Margin="10,0,0,0"
-                Background="#FF191919"
-                Command="{Binding OpenCommand}"
-                CommandParameter="TargetIsoPath"
-                Content="Öffnen"
-                Foreground="#FFD5D5D5"
-                Style="{StaticResource DefaultButtonStyle}" />
-        </StackPanel>
+        <!--  OSCDIMG PATH Row 0  -->
+        <Label
+            Grid.Row="0"
+            Grid.Column="0"
+            HorizontalContentAlignment="Right"
+            VerticalContentAlignment="Center"
+            Content="oscdimg.exe"
+            Foreground="#FFD5D5D5" />
+        <TextBox
+            Grid.Row="0"
+            Grid.Column="1"
+            Width="500"
+            Height="20"
+            Background="#FF191919"
+            Foreground="#FFD5D5D5"
+            IsReadOnly="True"
+            Text="{Binding OscdimgExeDirPath, UpdateSourceTrigger=PropertyChanged}" />
         <Button
+            Grid.Row="0"
+            Grid.Column="2"
+            Width="100"
+            Height="20"
+            Margin="10,0,0,0"
+            Background="#FF191919"
+            Command="{Binding OpenCommand}"
+            CommandParameter="OscdimgExeDirPath"
+            Content="Öffnen"
+            Foreground="#FFD5D5D5"
+            Style="{StaticResource DefaultButtonStyle}" />
+
+        <!--  Unattend.xml Row 1  -->
+        <Label
+            Grid.Row="1"
+            Grid.Column="0"
+            HorizontalContentAlignment="Right"
+            VerticalContentAlignment="Center"
+            Content="unattend.xml"
+            Foreground="#FFD5D5D5" />
+        <TextBox
+            Grid.Row="1"
+            Grid.Column="1"
+            Width="500"
+            Height="20"
+            Background="#FF191919"
+            Foreground="#FFD5D5D5"
+            IsReadOnly="True"
+            Text="{Binding UnattendXmlPath, UpdateSourceTrigger=PropertyChanged}" />
+        <Button
+            Grid.Row="1"
+            Grid.Column="2"
+            Width="100"
+            Height="20"
+            Margin="10,0,0,0"
+            Background="#FF191919"
+            Command="{Binding OpenCommand}"
+            CommandParameter="UnattendXmlPath"
+            Content="Öffnen"
+            Foreground="#FFD5D5D5"
+            Style="{StaticResource DefaultButtonStyle}" />
+
+        <!--  Unattend.xml Options Row 2  -->
+        <Label
+            Grid.Row="2"
+            Grid.Column="0"
+            HorizontalContentAlignment="Right"
+            VerticalContentAlignment="Center"
+            Content="unattend.xml"
+            Foreground="#FFD5D5D5" />
+        <ComboBox
+            Grid.Row="2"
+            Grid.Column="1"
+            Width="500"
+            Height="20"
+            SelectedIndex="0">
+            <ComboBoxItem Content="Datei Importieren" />
+            <ComboBoxItem Content="Konfiguration benutzen" />
+        </ComboBox>
+        <Button
+            Grid.Row="2"
+            Grid.Column="2"
+            Width="100"
+            Height="20"
+            Margin="10,0,0,0"
+            Background="#FF191919"
+            Command="{Binding OpenUnattendConfigCommand}"
+            Content="Konfiguration"
+            Foreground="#FFD5D5D5"
+            Style="{StaticResource DefaultButtonStyle}" />
+
+        <!--  Source Iso Path Row 3  -->
+        <Label
+            Grid.Row="3"
+            Grid.Column="0"
+            HorizontalContentAlignment="Right"
+            VerticalContentAlignment="Center"
+            Content="Quell Iso"
+            Foreground="#FFD5D5D5" />
+        <TextBox
+            Grid.Row="3"
+            Grid.Column="1"
+            Width="500"
+            Height="20"
+            Background="#FF191919"
+            Foreground="#FFD5D5D5"
+            IsReadOnly="True"
+            Text="{Binding SourceIsoPath, UpdateSourceTrigger=PropertyChanged}" />
+        <Button
+            Grid.Row="3"
+            Grid.Column="2"
+            Width="100"
+            Height="20"
+            Margin="10,0,0,0"
+            Background="#FF191919"
+            Command="{Binding OpenCommand}"
+            CommandParameter="SourceIsoPath"
+            Content="Öffnen"
+            Foreground="#FFD5D5D5"
+            Style="{StaticResource DefaultButtonStyle}" />
+
+        <!--  Source Iso Dir Path Row 4  -->
+        <Label
+            Grid.Row="4"
+            Grid.Column="0"
+            HorizontalContentAlignment="Right"
+            VerticalContentAlignment="Center"
+            Content="Quell Iso Ordner"
+            Foreground="#FFD5D5D5" />
+        <TextBox
+            Grid.Row="4"
+            Grid.Column="1"
+            Width="500"
+            Height="20"
+            Background="#FF191919"
+            Foreground="#FFD5D5D5"
+            IsReadOnly="True"
+            Text="{Binding SourceIsoDirPath, UpdateSourceTrigger=PropertyChanged}" />
+        <Button
+            Grid.Row="4"
+            Grid.Column="2"
+            Width="100"
+            Height="20"
+            Margin="10,0,0,0"
+            Background="#FF191919"
+            Command="{Binding OpenCommand}"
+            CommandParameter="SourceIsoDirPath"
+            Content="Öffnen"
+            Foreground="#FFD5D5D5"
+            Style="{StaticResource DefaultButtonStyle}" />
+
+        <!--  Target Iso Path Row 5  -->
+        <Label
+            Grid.Row="5"
+            Grid.Column="0"
+            HorizontalContentAlignment="Right"
+            VerticalContentAlignment="Center"
+            Content="Ziel Iso"
+            Foreground="#FFD5D5D5" />
+        <TextBox
+            Grid.Row="5"
+            Grid.Column="1"
+            Width="500"
+            Height="20"
+            Background="#FF191919"
+            Foreground="#FFD5D5D5"
+            IsReadOnly="True"
+            Text="{Binding TargetIsoPath, UpdateSourceTrigger=PropertyChanged}" />
+        <Button
+            Grid.Row="5"
+            Grid.Column="2"
+            Width="100"
+            Height="20"
+            Margin="10,0,0,0"
+            Background="#FF191919"
+            Command="{Binding OpenCommand}"
+            CommandParameter="TargetIsoPath"
+            Content="Öffnen"
+            Foreground="#FFD5D5D5"
+            Style="{StaticResource DefaultButtonStyle}" />
+
+        <!--  Create Image Button Row 6  -->
+        <Button
+            Grid.Row="6"
+            Grid.Column="1"
             Width="200"
             Height="30"
-            Margin="0,0,0,20"
             Background="#FF191919"
             Command="{Binding CreateCommand}"
             Content="Erstelle Image"
             Foreground="#FFD5D5D5"
             Style="{StaticResource DefaultButtonStyle}" />
+
+        <!--  Log Row 7  -->
         <TextBox
             x:Name="Log"
-            Height="300"
+            Grid.Row="7"
+            Grid.Column="1"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
             IsReadOnly="True"
@@ -234,5 +261,5 @@
                 </b:EventTrigger>
             </b:Interaction.Triggers>
         </TextBox>
-    </StackPanel>
+    </Grid>
 </UserControl>

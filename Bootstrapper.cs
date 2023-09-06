@@ -18,6 +18,8 @@ public class Bootstrapper : PrismBootstrapper
     {
         containerRegistry.RegisterScoped<IUnattendService, UnattendService>();
 
+        containerRegistry.RegisterDialog<LogonCommandDialogView, LogonCommandDialogViewModel>();
+
         containerRegistry.RegisterForNavigation<UnattendView, UnattendViewModel>();
     }
 }

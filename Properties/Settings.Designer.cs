@@ -82,5 +82,132 @@ namespace UnWin.Properties {
                 this["SourceIsoPath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public bool AutoLogonEnabled {
+            get {
+                return ((bool)(this["AutoLogonEnabled"]));
+            }
+            set {
+                this["AutoLogonEnabled"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public int AutoLogonCount {
+            get {
+                return ((int)(this["AutoLogonCount"]));
+            }
+            set {
+                this["AutoLogonCount"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string UserName {
+            get {
+                return ((string)(this["UserName"]));
+            }
+            set {
+                this["UserName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ComputerName {
+            get {
+                return ((string)(this["ComputerName"]));
+            }
+            set {
+                this["ComputerName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public int EFISize {
+            get {
+                return ((int)(this["EFISize"]));
+            }
+            set {
+                this["EFISize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public int OSSize {
+            get {
+                return ((int)(this["OSSize"]));
+            }
+            set {
+                this["OSSize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public int WinRESize {
+            get {
+                return ((int)(this["WinRESize"]));
+            }
+            set {
+                this["WinRESize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string FirstLogonCommands {
+            get {
+                return ((string)(this["FirstLogonCommands"]));
+            }
+            set {
+                this["FirstLogonCommands"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LogonCommands {
+            get {
+                return ((string)(this["LogonCommands"]));
+            }
+            set {
+                this["LogonCommands"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Language {
+            get {
+                return ((string)(this["Language"]));
+            }
+            set {
+                this["Language"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int VersionIndex {
+            get {
+                return ((int)(this["VersionIndex"]));
+            }
+            set {
+                this["VersionIndex"] = value;
+            }
+        }
     }
 }

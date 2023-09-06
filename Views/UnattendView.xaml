@@ -5,16 +5,199 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:UnWin.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:Background="White"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
+    d:DesignHeight="633.068"
+    d:DesignWidth="982.045"
     mc:Ignorable="d">
-    <StackPanel>
-        <StackPanel Height="50" Orientation="Horizontal">
-            <Label
-                HorizontalAlignment="Right"
-                VerticalAlignment="Center"
-                Content="Label" />
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="200" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="100" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  Computername Row 0  -->
+        <Label
+            Grid.Row="0"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            HorizontalContentAlignment="Right"
+            Content="Computername"
+            Foreground="#FFD5D5D5" />
+        <TextBox
+            Grid.Row="0"
+            Grid.Column="1"
+            Width="500"
+            Height="20"
+            d:Text="Computer01"
+            Background="#FF191919"
+            Foreground="#FFD5D5D5"
+            Text="{Binding ComputerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <!--  Benutzername Row 1  -->
+        <Label
+            Grid.Row="1"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            HorizontalContentAlignment="Right"
+            Content="Benutzername"
+            Foreground="#FFD5D5D5" />
+        <TextBox
+            Grid.Row="1"
+            Grid.Column="1"
+            Width="500"
+            Height="20"
+            d:Text="user01"
+            Background="#FF191919"
+            Foreground="#FFD5D5D5"
+            Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <!--  Lokalisierung Row 2  -->
+        <Label
+            Grid.Row="2"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            HorizontalContentAlignment="Right"
+            Content="Lokalisierung"
+            Foreground="#FFD5D5D5" />
+        <TextBox
+            Grid.Row="2"
+            Grid.Column="1"
+            Width="500"
+            Height="20"
+            d:Text="de-de"
+            Background="#FF191919"
+            Foreground="#FFD5D5D5"
+            Text="{Binding Language, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <!--  EFI Größe Row 3  -->
+        <Label
+            Grid.Row="3"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            HorizontalContentAlignment="Right"
+            Content="EFI Partition (MB)"
+            Foreground="#FFD5D5D5" />
+        <TextBox
+            Grid.Row="3"
+            Grid.Column="1"
+            Width="500"
+            Height="20"
+            d:Text="100"
+            Background="#FF191919"
+            Foreground="#FFD5D5D5"
+            Text="{Binding EFISize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <!--  OS Größe Row 4  -->
+        <Label
+            Grid.Row="4"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            HorizontalContentAlignment="Right"
+            Content="OS Partition (MB)"
+            Foreground="#FFD5D5D5" />
+        <TextBox
+            Grid.Row="4"
+            Grid.Column="1"
+            Width="500"
+            Height="20"
+            d:Text="100000"
+            Background="#FF191919"
+            Foreground="#FFD5D5D5"
+            Text="{Binding OSSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <!--  RE Größe Row 5  -->
+        <Label
+            Grid.Row="5"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            HorizontalContentAlignment="Right"
+            Content="Recovery Partition (MB)"
+            Foreground="#FFD5D5D5" />
+        <TextBox
+            Grid.Row="5"
+            Grid.Column="1"
+            Width="500"
+            Height="20"
+            d:Text="1000"
+            Background="#FF191919"
+            Foreground="#FFD5D5D5"
+            Text="{Binding WinRESize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <!--  Auto Logon Row 6  -->
+        <Label
+            Grid.Row="6"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            HorizontalContentAlignment="Right"
+            Content="Auto Logon"
+            Foreground="#FFD5D5D5" />
+        <ComboBox
+            Grid.Row="6"
+            Grid.Column="1"
+            Width="500"
+            Height="20"
+            d:SelectedIndex="0"
+            IsReadOnly="True"
+            SelectedIndex="{Binding AutoLogonEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <ComboBoxItem Content="Deaktiviert" />
+            <ComboBoxItem Content="Aktiviert" />
+        </ComboBox>
+
+        <!--  Auto Logon Count Row 7  -->
+        <Label
+            Grid.Row="7"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            HorizontalContentAlignment="Right"
+            Content="Logon Count"
+            Foreground="#FFD5D5D5" />
+        <TextBox
+            Grid.Row="7"
+            Grid.Column="1"
+            Width="500"
+            Height="20"
+            d:Text="1"
+            Background="#FF191919"
+            Foreground="#FFD5D5D5"
+            Text="{Binding AutoLogonCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <!--  First Logon Commands Row 8  -->
+        <Label
+            Grid.Row="8"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            HorizontalContentAlignment="Right"
+            Content="First Logon Commands"
+            Foreground="#FFD5D5D5" />
+        <ListBox
+            Grid.Row="8"
+            Grid.Column="1"
+            Width="500"
+            Margin="0,10,0,10"
+            d:ItemsSource="{d:SampleData ItemCount=5}" />
+        <StackPanel
+            Grid.Row="8"
+            Grid.Column="2"
+            VerticalAlignment="Center">
+            <Button
+                Width="150"
+                Margin="0,0,0,10"
+                Command="{Binding OpenLogonCommandDialog}"
+                Content="Hinzufügen" />
+            <Button Width="150" Content="Entfernen" />
         </StackPanel>
-    </StackPanel>
+    </Grid>
 </UserControl>

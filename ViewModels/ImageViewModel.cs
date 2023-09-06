@@ -11,6 +11,7 @@ using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
 using UnWin.Properties;
+using UnWin.Views;
 
 namespace UnWin.ViewModels;
 
@@ -30,8 +31,9 @@ public class ImageViewModel : BindableBase
     private string _targetIsoPath;
     private string _unattendXmlPath;
 
-    public ImageViewModel()
+    public ImageViewModel(IRegionManager regionManager)
     {
+        _regionManager = regionManager;
         TargetIsoPath = Settings.Default.TargetIsoPath;
         UnattendXmlPath = Settings.Default.UnattendXmlPath;
         OscdimgExeDirPath = Settings.Default.OscdimgExeDirPath;
@@ -187,7 +189,7 @@ public class ImageViewModel : BindableBase
 
     private void ExecuteOpenUnattendConfigCommand()
     {
-        _regionManager.RequestNavigate("ContentRegion", "UnattendView");
+        _regionManager.RequestNavigate("ContentRegion", nameof(UnattendView));
     }
 
     private async Task ExtractDirectory(DiscDirectoryInfo directory, string outputPath)
