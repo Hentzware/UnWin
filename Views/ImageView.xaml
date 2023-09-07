@@ -245,6 +245,7 @@
             Command="{Binding CreateCommand}"
             Content="Erstelle Image"
             Foreground="#FFD5D5D5"
+            IsEnabled="{Binding IsCreateImageEnabled, UpdateSourceTrigger=PropertyChanged}"
             Style="{StaticResource DefaultButtonStyle}" />
 
         <!--  Log Row 7  -->

@@ -23,6 +23,7 @@ public class ImageViewModel : BindableBase
     private readonly ISettingsService _settingsService;
     private bool _isAutounattendConfigEnabled;
     private bool _isAutounattendImportEnabled;
+    private bool _isCreateImageEnabled;
     private DelegateCommand _createCommand;
     private DelegateCommand _openUnattendConfigCommand;
     private DelegateCommand<string> _openCommand;
@@ -60,6 +61,23 @@ public class ImageViewModel : BindableBase
 
     public bool IsAutounattendImportEnabled => _autounattendMode == 0;
 
+    public bool IsCreateImageEnabled
+    {
+        get
+        {
+            if ((_autounattendMode == 0 && string.IsNullOrEmpty(_autounattendPath)) ||
+                string.IsNullOrEmpty(_oscdimgPath) ||
+                string.IsNullOrEmpty(_sourceIsoPath) ||
+                string.IsNullOrEmpty(_extractionPath) ||
+                string.IsNullOrEmpty(_targetIsoPath))
+            {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
     public int AutounattendMode
     {
         get => _autounattendMode;
@@ -69,6 +87,7 @@ public class ImageViewModel : BindableBase
             RaisePropertyChanged();
             RaisePropertyChanged(nameof(IsAutounattendConfigEnabled));
             RaisePropertyChanged(nameof(IsAutounattendImportEnabled));
+            RaisePropertyChanged(nameof(IsCreateImageEnabled));
             SaveSettings();
         }
     }
@@ -80,6 +99,7 @@ public class ImageViewModel : BindableBase
         {
             SetProperty(ref _autounattendPath, value);
             RaisePropertyChanged();
+            RaisePropertyChanged(nameof(IsCreateImageEnabled));
             SaveSettings();
         }
     }
@@ -91,6 +111,7 @@ public class ImageViewModel : BindableBase
         {
             SetProperty(ref _extractionPath, value);
             RaisePropertyChanged();
+            RaisePropertyChanged(nameof(IsCreateImageEnabled));
             SaveSettings();
         }
     }
@@ -112,6 +133,7 @@ public class ImageViewModel : BindableBase
         {
             SetProperty(ref _oscdimgPath, value);
             RaisePropertyChanged();
+            RaisePropertyChanged(nameof(IsCreateImageEnabled));
             SaveSettings();
         }
     }
@@ -123,6 +145,7 @@ public class ImageViewModel : BindableBase
         {
             SetProperty(ref _sourceIsoPath, value);
             RaisePropertyChanged();
+            RaisePropertyChanged(nameof(IsCreateImageEnabled));
             SaveSettings();
         }
     }
@@ -134,6 +157,7 @@ public class ImageViewModel : BindableBase
         {
             SetProperty(ref _targetIsoPath, value);
             RaisePropertyChanged();
+            RaisePropertyChanged(nameof(IsCreateImageEnabled));
             SaveSettings();
         }
     }
