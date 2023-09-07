@@ -96,6 +96,7 @@
             Margin="10,0,10,0"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
+            IsEnabled="{Binding IsAutounattendImportEnabled, UpdateSourceTrigger=PropertyChanged}"
             Text="{Binding AutounattendPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Button
             Grid.Row="1"
@@ -109,6 +110,7 @@
             CommandParameter="AutounattendPath"
             Content="Öffnen"
             Foreground="#FFD5D5D5"
+            IsEnabled="{Binding IsAutounattendImportEnabled, UpdateSourceTrigger=PropertyChanged}"
             Style="{StaticResource DefaultButtonStyle}" />
 
         <!--  Unattend.xml Options Row 2  -->
@@ -139,6 +141,7 @@
             Command="{Binding OpenUnattendConfigCommand}"
             Content="Konfiguration"
             Foreground="#FFD5D5D5"
+            IsEnabled="{Binding IsAutounattendConfigEnabled, UpdateSourceTrigger=PropertyChanged}"
             Style="{StaticResource DefaultButtonStyle}" />
 
         <!--  Source Iso Path Row 3  -->

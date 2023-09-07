@@ -5,10 +5,37 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:UnWin.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Height="670"
+    Height="837"
+    VerticalAlignment="Top"
     d:DesignWidth="982.045"
     mc:Ignorable="d">
-    <Grid>
+    <UserControl.Resources>
+        <Style x:Key="DefaultButtonStyle" TargetType="Button">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            Name="border"
+                            Padding="4,2"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="DarkGray"
+                            BorderThickness="1"
+                            CornerRadius="3">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="Black" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid Margin="20,20,20,20">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200" />
             <ColumnDefinition Width="1*" MinWidth="200" />
@@ -25,8 +52,7 @@
             <RowDefinition Height="50" />
             <RowDefinition Height="100" />
             <RowDefinition Height="100" />
-            <RowDefinition Height="33.068" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="100" />
         </Grid.RowDefinitions>
 
         <!--  Computername Row 0  -->
@@ -209,12 +235,16 @@
                 Margin="0,0,0,10"
                 Command="{Binding OpenLogonCommandDialog}"
                 CommandParameter="FirstLogon"
-                Content="Hinzufügen" />
+                Content="Hinzufügen"
+                Foreground="#FFD5D5D5"
+                Style="{StaticResource DefaultButtonStyle}" Background="#FF313131" Height="25" HorizontalAlignment="Left" />
             <Button
                 Width="150"
                 Command="{Binding DeleteLogonCommand}"
                 CommandParameter="FirstLogonCommand"
-                Content="Entfernen" />
+                Content="Entfernen"
+                Foreground="#FFD5D5D5"
+                Style="{StaticResource DefaultButtonStyle}" Background="#FF313131" Height="25" Margin="0,0,0,0" HorizontalAlignment="Left" />
         </StackPanel>
 
         <!--  Logon Commands Row 9  -->
@@ -252,23 +282,27 @@
                 Margin="0,0,0,10"
                 Command="{Binding OpenLogonCommandDialog}"
                 CommandParameter="Always"
-                Content="Hinzufügen" />
+                Content="Hinzufügen"
+                Foreground="#FFD5D5D5"
+                Style="{StaticResource DefaultButtonStyle}" Background="#FF313131" Height="25" HorizontalAlignment="Left" />
             <Button
                 Width="150"
                 Command="{Binding DeleteLogonCommand}"
                 CommandParameter="LogonCommand"
-                Content="Entfernen" />
+                Content="Entfernen"
+                Foreground="#FFD5D5D5"
+                Style="{StaticResource DefaultButtonStyle}" Background="#FF313131" Height="25" Margin="0,0,0,0" HorizontalAlignment="Left" />
         </StackPanel>
 
         <Button
             Grid.Row="10"
             Grid.Column="0"
             Grid.ColumnSpan="3"
-            Width="200"
-            Height="30"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
+            Width="250"
+            Height="40"
             Command="{Binding NavigateBackCommand}"
-            Content="Ok" />
+            Content="Ok"
+            Foreground="#FFD5D5D5"
+            Style="{StaticResource DefaultButtonStyle}" Background="#FF313131" Margin="0,0,0,0" />
     </Grid>
 </UserControl>

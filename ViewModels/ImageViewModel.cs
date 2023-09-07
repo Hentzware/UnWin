@@ -21,6 +21,8 @@ public class ImageViewModel : BindableBase
 {
     private readonly IRegionManager _regionManager;
     private readonly ISettingsService _settingsService;
+    private bool _isAutounattendConfigEnabled;
+    private bool _isAutounattendImportEnabled;
     private DelegateCommand _createCommand;
     private DelegateCommand _openUnattendConfigCommand;
     private DelegateCommand<string> _openCommand;
@@ -54,6 +56,10 @@ public class ImageViewModel : BindableBase
     public DelegateCommand OpenUnattendConfigCommand =>
         _openUnattendConfigCommand ?? new DelegateCommand(ExecuteOpenUnattendConfigCommand);
 
+    public bool IsAutounattendConfigEnabled => _autounattendMode == 1;
+
+    public bool IsAutounattendImportEnabled => _autounattendMode == 0;
+
     public int AutounattendMode
     {
         get => _autounattendMode;
@@ -61,6 +67,8 @@ public class ImageViewModel : BindableBase
         {
             SetProperty(ref _autounattendMode, value);
             RaisePropertyChanged();
+            RaisePropertyChanged(nameof(IsAutounattendConfigEnabled));
+            RaisePropertyChanged(nameof(IsAutounattendImportEnabled));
             SaveSettings();
         }
     }
