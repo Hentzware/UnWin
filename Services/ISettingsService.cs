@@ -4,6 +4,11 @@ namespace UnWin.Services;
 
 public interface ISettingsService
 {
-    Settings Load();
-    void Save(Settings settings);
+    AutounattendSettings LoadAutounattendSettings();
+
+    ImageSettings LoadImageSettings();
+
+    void SaveAutounattendSettings(AutounattendSettings settings);
+
+    void SaveImageSettings(ImageSettings settings);
 }

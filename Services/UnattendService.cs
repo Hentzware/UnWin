@@ -92,7 +92,7 @@ namespace UnWin.Services
 
                         writer.WriteStartElement("component");
 
-                            writer.WriteAttributeString("name", null, Constants.ComponentNames.MicrosoftWindowsInternationalCore);
+                            writer.WriteAttributeString("name", null, null);
                             writer.WriteAttributeString("processorArchitecture", null, "amd64");
 
                         writer.WriteEndElement();

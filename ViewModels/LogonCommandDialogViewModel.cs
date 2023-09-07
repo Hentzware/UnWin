@@ -12,6 +12,9 @@ public class LogonCommandDialogViewModel : BindableBase, IDialogAware
     private int _order;
     private string _command;
 
+    public DelegateCommand<string> CloseCommand =>
+        _closeCommand ?? new DelegateCommand<string>(ExecuteCloseCommand);
+
     public bool UserInputRequired
     {
         get => _userInputRequired;
@@ -21,9 +24,6 @@ public class LogonCommandDialogViewModel : BindableBase, IDialogAware
             RaisePropertyChanged();
         }
     }
-
-    public DelegateCommand<string> CloseCommand =>
-        _closeCommand ?? new DelegateCommand<string>(ExecuteCloseCommand);
 
     public int Order
     {
@@ -56,11 +56,12 @@ public class LogonCommandDialogViewModel : BindableBase, IDialogAware
 
     public void OnDialogOpened(IDialogParameters parameters)
     {
+        
     }
 
-    public string Title { get; }
-
     public event Action<IDialogResult>? RequestClose;
+
+    public string Title { get; }
 
     private void ExecuteCloseCommand(string ctx)
     {

@@ -5,13 +5,13 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:UnWin.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="633.068"
+    Height="670"
     d:DesignWidth="982.045"
     mc:Ignorable="d">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200" />
-            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" MinWidth="200" />
             <ColumnDefinition Width="200" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -25,7 +25,7 @@
             <RowDefinition Height="50" />
             <RowDefinition Height="100" />
             <RowDefinition Height="100" />
-            <RowDefinition Height="100" />
+            <RowDefinition Height="33.068" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
@@ -40,8 +40,8 @@
         <TextBox
             Grid.Row="0"
             Grid.Column="1"
-            Width="500"
             Height="20"
+            Margin="10,0,10,0"
             d:Text="Computer01"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
@@ -58,8 +58,8 @@
         <TextBox
             Grid.Row="1"
             Grid.Column="1"
-            Width="500"
             Height="20"
+            Margin="10,0,10,0"
             d:Text="user01"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
@@ -76,8 +76,8 @@
         <TextBox
             Grid.Row="2"
             Grid.Column="1"
-            Width="500"
             Height="20"
+            Margin="10,0,10,0"
             d:Text="de-de"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
@@ -94,8 +94,8 @@
         <TextBox
             Grid.Row="3"
             Grid.Column="1"
-            Width="500"
             Height="20"
+            Margin="10,0,10,0"
             d:Text="100"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
@@ -112,8 +112,8 @@
         <TextBox
             Grid.Row="4"
             Grid.Column="1"
-            Width="500"
             Height="20"
+            Margin="10,0,10,0"
             d:Text="100000"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
@@ -130,8 +130,8 @@
         <TextBox
             Grid.Row="5"
             Grid.Column="1"
-            Width="500"
             Height="20"
+            Margin="10,0,10,0"
             d:Text="1000"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
@@ -148,8 +148,8 @@
         <ComboBox
             Grid.Row="6"
             Grid.Column="1"
-            Width="500"
-            Height="20"
+            Height="23"
+            Margin="10,0,10,0"
             d:SelectedIndex="0"
             IsReadOnly="True"
             SelectedIndex="{Binding AutoLogonEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
@@ -168,8 +168,8 @@
         <TextBox
             Grid.Row="7"
             Grid.Column="1"
-            Width="500"
             Height="20"
+            Margin="10,0,10,0"
             d:Text="1"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
@@ -186,10 +186,10 @@
         <ListBox
             Grid.Row="8"
             Grid.Column="1"
-            Width="500"
-            Margin="0,10,0,10"
+            Margin="10,10,10,10"
             d:ItemsSource="{d:SampleData ItemCount=5}"
-            ItemsSource="{Binding FirstLogonCommands, UpdateSourceTrigger=PropertyChanged}">
+            ItemsSource="{Binding FirstLogonCommands, UpdateSourceTrigger=PropertyChanged}"
+            SelectedIndex="{Binding FirstLogonCommandSelectedIndex}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
@@ -210,7 +210,11 @@
                 Command="{Binding OpenLogonCommandDialog}"
                 CommandParameter="FirstLogon"
                 Content="Hinzufügen" />
-            <Button Width="150" Content="Entfernen" />
+            <Button
+                Width="150"
+                Command="{Binding DeleteLogonCommand}"
+                CommandParameter="FirstLogonCommand"
+                Content="Entfernen" />
         </StackPanel>
 
         <!--  Logon Commands Row 9  -->
@@ -224,10 +228,10 @@
         <ListBox
             Grid.Row="9"
             Grid.Column="1"
-            Width="500"
-            Margin="41,10,41,10"
+            Margin="10,10,10,10"
             d:ItemsSource="{d:SampleData ItemCount=5}"
-            ItemsSource="{Binding LogonCommands, UpdateSourceTrigger=PropertyChanged}">
+            ItemsSource="{Binding LogonCommands, UpdateSourceTrigger=PropertyChanged}"
+            SelectedIndex="{Binding LogonCommandSelectedIndex}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
@@ -249,7 +253,11 @@
                 Command="{Binding OpenLogonCommandDialog}"
                 CommandParameter="Always"
                 Content="Hinzufügen" />
-            <Button Width="150" Content="Entfernen" />
+            <Button
+                Width="150"
+                Command="{Binding DeleteLogonCommand}"
+                CommandParameter="LogonCommand"
+                Content="Entfernen" />
         </StackPanel>
 
         <Button

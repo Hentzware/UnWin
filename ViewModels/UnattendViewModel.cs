@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 using Prism.Services.Dialogs;
@@ -13,12 +13,17 @@ namespace UnWin.ViewModels;
 public class UnattendViewModel : BindableBase
 {
     private readonly IDialogService _dialogService;
+    private readonly IEventAggregator _eventAggregator;
     private readonly IRegionManager _regionManager;
+    private readonly ISettingsService _settingsService;
     private bool _autoLogonEnabled;
     private DelegateCommand _navigateBackCommand;
+    private DelegateCommand<string> _deleteLogonCommand;
     private DelegateCommand<string> _openLogonCommandDialog;
     private int _autoLogonCount;
     private int _efiSize;
+    private int _firstLogonCommandSelectedIndex;
+    private int _logonCommandSelectedIndex;
     private int _osSize;
     private int _versionIndex;
     private int _winRESize;
@@ -28,19 +33,28 @@ public class UnattendViewModel : BindableBase
     private string _language;
     private string _userName;
 
-    public UnattendViewModel(IRegionManager regionManager, IDialogService dialogService, ISettingsService settingsService)
+    public UnattendViewModel(
+        IRegionManager regionManager,
+        IDialogService dialogService,
+        ISettingsService settingsService,
+        IEventAggregator eventAggregator)
     {
         _regionManager = regionManager;
         _dialogService = dialogService;
-        FirstLogonCommands = new List<LogonCommand>();
-        LogonCommands = new List<LogonCommand>();
+        _settingsService = settingsService;
+        _eventAggregator = eventAggregator;
 
-        var currentSettings = new Models.Settings();
-        currentSettings.AutoLogonCount = AutoLogonCount;
-        currentSettings.AutoLogonEnabled = AutoLogonEnabled;
-
-        settingsService.Save(currentSettings);
+        LoadSettings();
     }
+
+    public DelegateCommand<string> DeleteLogonCommand =>
+        _deleteLogonCommand ?? new DelegateCommand<string>(ExecuteDeleteLogonCommand);
+
+    public DelegateCommand NavigateBackCommand =>
+        _navigateBackCommand ?? new DelegateCommand(ExecuteNavigateBackCommand);
+
+    public DelegateCommand<string> OpenLogonCommandDialog =>
+        _openLogonCommandDialog ?? new DelegateCommand<string>(ExecuteOpenLogonCommandDialog);
 
     public bool AutoLogonEnabled
     {
@@ -49,14 +63,9 @@ public class UnattendViewModel : BindableBase
         {
             SetProperty(ref _autoLogonEnabled, value);
             RaisePropertyChanged();
+            SaveSettings();
         }
     }
-
-    public DelegateCommand NavigateBackCommand =>
-        _navigateBackCommand ?? new DelegateCommand(ExecuteNavigateBackCommand);
-
-    public DelegateCommand<string> OpenLogonCommandDialog =>
-        _openLogonCommandDialog ?? new DelegateCommand<string>(ExecuteOpenLogonCommandDialog);
 
     public int AutoLogonCount
     {
@@ -65,6 +74,7 @@ public class UnattendViewModel : BindableBase
         {
             SetProperty(ref _autoLogonCount, value);
             RaisePropertyChanged();
+            SaveSettings();
         }
     }
 
@@ -74,6 +84,27 @@ public class UnattendViewModel : BindableBase
         set
         {
             SetProperty(ref _efiSize, value);
+            RaisePropertyChanged();
+            SaveSettings();
+        }
+    }
+
+    public int FirstLogonCommandSelectedIndex
+    {
+        get => _firstLogonCommandSelectedIndex;
+        set
+        {
+            SetProperty(ref _firstLogonCommandSelectedIndex, value);
+            RaisePropertyChanged();
+        }
+    }
+
+    public int LogonCommandSelectedIndex
+    {
+        get => _logonCommandSelectedIndex;
+        set
+        {
+            SetProperty(ref _logonCommandSelectedIndex, value);
             RaisePropertyChanged();
         }
     }
@@ -85,6 +116,7 @@ public class UnattendViewModel : BindableBase
         {
             SetProperty(ref _osSize, value);
             RaisePropertyChanged();
+            SaveSettings();
         }
     }
 
@@ -95,6 +127,7 @@ public class UnattendViewModel : BindableBase
         {
             SetProperty(ref _versionIndex, value);
             RaisePropertyChanged();
+            SaveSettings();
         }
     }
 
@@ -105,6 +138,7 @@ public class UnattendViewModel : BindableBase
         {
             SetProperty(ref _winRESize, value);
             RaisePropertyChanged();
+            SaveSettings();
         }
     }
 
@@ -115,6 +149,7 @@ public class UnattendViewModel : BindableBase
         {
             SetProperty(ref _firstLogonCommands, value);
             RaisePropertyChanged();
+            SaveSettings();
         }
     }
 
@@ -125,6 +160,7 @@ public class UnattendViewModel : BindableBase
         {
             SetProperty(ref _logonCommands, value);
             RaisePropertyChanged();
+            SaveSettings();
         }
     }
 
@@ -135,6 +171,7 @@ public class UnattendViewModel : BindableBase
         {
             SetProperty(ref _computerName, value);
             RaisePropertyChanged();
+            SaveSettings();
         }
     }
 
@@ -145,6 +182,7 @@ public class UnattendViewModel : BindableBase
         {
             SetProperty(ref _language, value);
             RaisePropertyChanged();
+            SaveSettings();
         }
     }
 
@@ -155,6 +193,31 @@ public class UnattendViewModel : BindableBase
         {
             SetProperty(ref _userName, value);
             RaisePropertyChanged();
+            SaveSettings();
+        }
+    }
+
+    private void ExecuteDeleteLogonCommand(string ctx)
+    {
+        switch (ctx)
+        {
+            case "FirstLogonCommand":
+                if (_firstLogonCommandSelectedIndex > -1)
+                {
+                    FirstLogonCommands.RemoveAt(_firstLogonCommandSelectedIndex);
+                    FirstLogonCommands = new List<LogonCommand>(FirstLogonCommands);
+                }
+
+                break;
+
+            case "LogonCommand":
+                if (_logonCommandSelectedIndex > -1)
+                {
+                    LogonCommands.RemoveAt(_logonCommandSelectedIndex);
+                    LogonCommands = new List<LogonCommand>(LogonCommands);
+                }
+
+                break;
         }
     }
 
@@ -174,7 +237,10 @@ public class UnattendViewModel : BindableBase
                 UserInputRequired = result.Parameters.GetValue<bool>("UserInputRequired")
             };
 
-            if (result.Result == ButtonResult.Cancel) return;
+            if (result.Result == ButtonResult.Cancel || result.Result == ButtonResult.None)
+            {
+                return;
+            }
 
             if (ctx == "FirstLogon")
             {
@@ -186,5 +252,42 @@ public class UnattendViewModel : BindableBase
             LogonCommands.Add(cmd);
             LogonCommands = new List<LogonCommand>(LogonCommands);
         });
+    }
+
+    private void LoadSettings()
+    {
+        var autounattendSettings = _settingsService.LoadAutounattendSettings();
+
+        AutoLogonCount = autounattendSettings.AutoLogonCount;
+        AutoLogonEnabled = autounattendSettings.AutoLogonEnabled;
+        ComputerName = autounattendSettings.ComputerName;
+        EFISize = autounattendSettings.EFISize;
+        FirstLogonCommands = autounattendSettings.FirstLogonCommands;
+        Language = autounattendSettings.Language;
+        LogonCommands = autounattendSettings.LogonCommands;
+        OSSize = autounattendSettings.OSSize;
+        UserName = autounattendSettings.UserName;
+        VersionIndex = autounattendSettings.VersionIndex;
+        WinRESize = autounattendSettings.WinRESize;
+    }
+
+    private void SaveSettings()
+    {
+        var autounattendSettings = new AutounattendSettings
+        {
+            AutoLogonCount = _autoLogonCount,
+            AutoLogonEnabled = _autoLogonEnabled,
+            ComputerName = _computerName,
+            EFISize = _efiSize,
+            FirstLogonCommands = _firstLogonCommands,
+            Language = _language,
+            LogonCommands = _logonCommands,
+            OSSize = _osSize,
+            UserName = _userName,
+            VersionIndex = _versionIndex,
+            WinRESize = _winRESize
+        };
+
+        _settingsService.SaveAutounattendSettings(autounattendSettings);
     }
 }

@@ -12,7 +12,6 @@ using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 using UnWin.Models;
-using UnWin.PubSubEvents;
 using UnWin.Services;
 using UnWin.Views;
 
@@ -22,42 +21,26 @@ public class ImageViewModel : BindableBase
 {
     private readonly IRegionManager _regionManager;
     private readonly ISettingsService _settingsService;
-    private readonly IEventAggregator _eventAggregator;
     private DelegateCommand _createCommand;
     private DelegateCommand _openUnattendConfigCommand;
     private DelegateCommand<string> _openCommand;
     private DelegateCommand<TextBox> _onTextChanged;
+    private int _autounattendMode;
+    private string _autounattendPath;
     private string _efisysBinPath;
-    private string _etfsbootComPath;
+    private string _extractionPath;
     private string _log;
-    private string _oscdimgExeDirPath;
-    private string _sourceIsoDirPath;
+    private string _oscdimgPath;
     private string _sourceIsoPath;
     private string _targetIsoPath;
-    private string _unattendXmlPath;
-    private Settings _settings;
 
     public ImageViewModel(IRegionManager regionManager, ISettingsService settingsService, IEventAggregator eventAggregator)
     {
         _regionManager = regionManager;
         _settingsService = settingsService;
-        _eventAggregator = eventAggregator;
 
-        _eventAggregator.GetEvent<CloseEvent>().Subscribe(OnAppClosing);
-        _settings = _settingsService.Load();
-
-        OscdimgExeDirPath = _settings.OscdimgPath;
-        SourceIsoPath = _settings.SourceIsoPath;
-        SourceIsoDirPath = _settings.SourceIsoPath;
-        TargetIsoPath = _settings.TargetIsoPath;
-        UnattendXmlPath = _settings.AutounattendPath;
+        LoadSettings();
     }
-
-    private void OnAppClosing()
-    {
-        _settingsService.Save(_settings);
-    }
-
 
     public DelegateCommand CreateCommand =>
         _createCommand ?? new DelegateCommand(ExecuteCreateCommand);
@@ -71,6 +54,39 @@ public class ImageViewModel : BindableBase
     public DelegateCommand OpenUnattendConfigCommand =>
         _openUnattendConfigCommand ?? new DelegateCommand(ExecuteOpenUnattendConfigCommand);
 
+    public int AutounattendMode
+    {
+        get => _autounattendMode;
+        set
+        {
+            SetProperty(ref _autounattendMode, value);
+            RaisePropertyChanged();
+            SaveSettings();
+        }
+    }
+
+    public string AutounattendPath
+    {
+        get => _autounattendPath;
+        set
+        {
+            SetProperty(ref _autounattendPath, value);
+            RaisePropertyChanged();
+            SaveSettings();
+        }
+    }
+
+    public string ExtractionPath
+    {
+        get => _extractionPath;
+        set
+        {
+            SetProperty(ref _extractionPath, value);
+            RaisePropertyChanged();
+            SaveSettings();
+        }
+    }
+
     public string Log
     {
         get => _log;
@@ -81,24 +97,14 @@ public class ImageViewModel : BindableBase
         }
     }
 
-    public string OscdimgExeDirPath
+    public string OscdimgPath
     {
-        get => _oscdimgExeDirPath;
+        get => _oscdimgPath;
         set
         {
-            SetProperty(ref _oscdimgExeDirPath, value);
-            _settings.OscdimgPath = value;
+            SetProperty(ref _oscdimgPath, value);
             RaisePropertyChanged();
-        }
-    }
-
-    public string SourceIsoDirPath
-    {
-        get => _sourceIsoDirPath;
-        set
-        {
-            SetProperty(ref _sourceIsoDirPath, value);
-            RaisePropertyChanged();
+            SaveSettings();
         }
     }
 
@@ -108,8 +114,8 @@ public class ImageViewModel : BindableBase
         set
         {
             SetProperty(ref _sourceIsoPath, value);
-            _settings.SourceIsoPath = value;
             RaisePropertyChanged();
+            SaveSettings();
         }
     }
 
@@ -119,43 +125,32 @@ public class ImageViewModel : BindableBase
         set
         {
             SetProperty(ref _targetIsoPath, value);
-            _settings.TargetIsoPath = value;
             RaisePropertyChanged();
-        }
-    }
-
-    public string UnattendXmlPath
-    {
-        get => _unattendXmlPath;
-        set
-        {
-            SetProperty(ref _unattendXmlPath, value);
-            _settings.AutounattendPath = value;
-            RaisePropertyChanged();
+            SaveSettings();
         }
     }
 
     private void ApplyUnattend()
     {
-        var xml3 = Path.Combine(_sourceIsoDirPath, "autounattend.xml");
+        var xml3 = Path.Combine(_extractionPath, "autounattend.xml");
 
         if (File.Exists(xml3))
         {
             File.Delete(xml3);
         }
 
-        File.Copy(_unattendXmlPath, xml3);
+        File.Copy(_autounattendPath, xml3);
     }
 
     private async Task CreateImage()
     {
-        await RunCommand($"oscdimg.exe -m -o -h -u2 -udfver102 -b\"{_efisysBinPath}\" -pEF \"{_sourceIsoDirPath}\" \"{_targetIsoPath}\"");
+        await RunCommand($"oscdimg.exe -m -o -h -u2 -udfver102 -b\"{_efisysBinPath}\" -pEF \"{_extractionPath}\" \"{_targetIsoPath}\"");
     }
 
     private async void ExecuteCreateCommand()
     {
         await ExtractIso();
-        SearchFiles();
+        SearchEFIBootFile();
         RemoveBootPrompt();
         ApplyUnattend();
         await CreateImage();
@@ -174,13 +169,13 @@ public class ImageViewModel : BindableBase
 
         switch (ctx)
         {
-            case nameof(OscdimgExeDirPath):
-                OscdimgExeDirPath = SelectFolder(openFolderDialog);
+            case nameof(OscdimgPath):
+                OscdimgPath = SelectFolder(openFolderDialog);
                 break;
 
-            case nameof(UnattendXmlPath):
+            case nameof(AutounattendPath):
                 openFileDialog.Filter = "XML|*.xml";
-                UnattendXmlPath = SelectFile(openFileDialog);
+                AutounattendPath = SelectFile(openFileDialog);
                 break;
 
             case nameof(SourceIsoPath):
@@ -188,8 +183,8 @@ public class ImageViewModel : BindableBase
                 SourceIsoPath = SelectFile(openFileDialog);
                 break;
 
-            case nameof(SourceIsoDirPath):
-                SourceIsoDirPath = SelectFolder(openFolderDialog);
+            case nameof(ExtractionPath):
+                ExtractionPath = SelectFolder(openFolderDialog);
                 break;
 
             case nameof(TargetIsoPath):
@@ -229,7 +224,7 @@ public class ImageViewModel : BindableBase
 
     private async Task ExtractIso()
     {
-        if (Directory.GetFiles(_sourceIsoDirPath).Length > 0)
+        if (Directory.GetFiles(_extractionPath).Length > 0)
         {
             return;
         }
@@ -237,22 +232,34 @@ public class ImageViewModel : BindableBase
         using (var isoStream = File.OpenRead(_sourceIsoPath))
         {
             var udf = new UdfReader(isoStream);
-            await ExtractDirectory(udf.Root, _sourceIsoDirPath);
+            await ExtractDirectory(udf.Root, _extractionPath);
         }
+    }
+
+    private void LoadSettings()
+    {
+        var imageSettings = _settingsService.LoadImageSettings();
+
+        OscdimgPath = imageSettings.OscdimgPath;
+        SourceIsoPath = imageSettings.SourceIsoPath;
+        TargetIsoPath = imageSettings.TargetIsoPath;
+        AutounattendPath = imageSettings.AutounattendPath;
+        AutounattendMode = imageSettings.AutounattendMode;
+        ExtractionPath = imageSettings.ExtractionPath;
     }
 
     private void RemoveBootPrompt()
     {
-        var cdbootEfiPrompt = Directory.GetFiles(_sourceIsoDirPath, "cdboot_prompt.efi", SearchOption.AllDirectories)
+        var cdbootEfiPrompt = Directory.GetFiles(_extractionPath, "cdboot_prompt.efi", SearchOption.AllDirectories)
             .FirstOrDefault();
-        var cdbootEfi = Directory.GetFiles(_sourceIsoDirPath, "cdboot.efi", SearchOption.AllDirectories)
+        var cdbootEfi = Directory.GetFiles(_extractionPath, "cdboot.efi", SearchOption.AllDirectories)
             .FirstOrDefault();
         var cdbootEfiNoPrompt = Directory
-            .GetFiles(_sourceIsoDirPath, "cdboot_noprompt.efi", SearchOption.AllDirectories).FirstOrDefault();
-        var efisysBin = Directory.GetFiles(_sourceIsoDirPath, "efisys.bin", SearchOption.AllDirectories)
+            .GetFiles(_extractionPath, "cdboot_noprompt.efi", SearchOption.AllDirectories).FirstOrDefault();
+        var efisysBin = Directory.GetFiles(_extractionPath, "efisys.bin", SearchOption.AllDirectories)
             .FirstOrDefault();
         var efisysBinNoPrompt = Directory
-            .GetFiles(_sourceIsoDirPath, "efisys_noprompt.bin", SearchOption.AllDirectories).FirstOrDefault();
+            .GetFiles(_extractionPath, "efisys_noprompt.bin", SearchOption.AllDirectories).FirstOrDefault();
         var directory = cdbootEfi.Replace("cdboot.efi", "");
 
 
@@ -290,7 +297,7 @@ public class ImageViewModel : BindableBase
             RedirectStandardOutput = true,
             UseShellExecute = false,
             CreateNoWindow = true,
-            WorkingDirectory = _oscdimgExeDirPath
+            WorkingDirectory = _oscdimgPath
         };
 
         using var process = new Process { StartInfo = cmd, EnableRaisingEvents = true };
@@ -333,10 +340,24 @@ public class ImageViewModel : BindableBase
         return string.Empty;
     }
 
-    private void SearchFiles()
+    private void SaveSettings()
     {
-        _efisysBinPath = Directory.GetFiles(_sourceIsoDirPath, "efisys.bin", SearchOption.AllDirectories).First();
-        _etfsbootComPath = Directory.GetFiles(_sourceIsoDirPath, "etfsboot.com", SearchOption.AllDirectories).First();
+        var imageSettings = new ImageSettings
+        {
+            OscdimgPath = _oscdimgPath,
+            SourceIsoPath = _sourceIsoPath,
+            TargetIsoPath = _targetIsoPath,
+            AutounattendPath = _autounattendPath,
+            AutounattendMode = _autounattendMode,
+            ExtractionPath = _extractionPath
+        };
+
+        _settingsService.SaveImageSettings(imageSettings);
+    }
+
+    private void SearchEFIBootFile()
+    {
+        _efisysBinPath = Directory.GetFiles(_extractionPath, "efisys.bin", SearchOption.AllDirectories).First();
     }
 
     private string SelectFile(OpenFileDialog openFileDialog)

@@ -7,8 +7,6 @@
     xmlns:interactivity="http://prismlibrary.com/"
     xmlns:local="clr-namespace:UnWin.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="600"
-    d:DesignWidth="900"
     mc:Ignorable="d">
     <UserControl.Resources>
         <Style x:Key="DefaultButtonStyle" TargetType="Button">
@@ -36,10 +34,10 @@
             </Setter>
         </Style>
     </UserControl.Resources>
-    <Grid Margin="10,20,10,20">
+    <Grid Margin="20,20,20,20">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200" />
-            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" MinWidth="200" />
             <ColumnDefinition Width="200" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -49,9 +47,8 @@
             <RowDefinition Height="50" />
             <RowDefinition Height="50" />
             <RowDefinition Height="50" />
-            <RowDefinition Height="50" />
-            <RowDefinition Height="200" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="100" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <!--  OSCDIMG PATH Row 0  -->
@@ -60,26 +57,26 @@
             Grid.Column="0"
             HorizontalContentAlignment="Right"
             VerticalContentAlignment="Center"
-            Content="oscdimg.exe"
+            Content="oscdimg Ordner Pfad"
             Foreground="#FFD5D5D5" />
         <TextBox
             Grid.Row="0"
             Grid.Column="1"
-            Width="500"
             Height="20"
+            Margin="10,0,10,0"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
-            IsReadOnly="True"
-            Text="{Binding OscdimgExeDirPath, UpdateSourceTrigger=PropertyChanged}" />
+            Text="{Binding OscdimgPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Button
             Grid.Row="0"
             Grid.Column="2"
             Width="100"
-            Height="20"
-            Margin="10,0,0,0"
-            Background="#FF191919"
+            Height="25"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            Background="#FF313131"
             Command="{Binding OpenCommand}"
-            CommandParameter="OscdimgExeDirPath"
+            CommandParameter="OscdimgPath"
             Content="Öffnen"
             Foreground="#FFD5D5D5"
             Style="{StaticResource DefaultButtonStyle}" />
@@ -90,26 +87,26 @@
             Grid.Column="0"
             HorizontalContentAlignment="Right"
             VerticalContentAlignment="Center"
-            Content="unattend.xml"
+            Content="autounattend.xml"
             Foreground="#FFD5D5D5" />
         <TextBox
             Grid.Row="1"
             Grid.Column="1"
-            Width="500"
             Height="20"
+            Margin="10,0,10,0"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
-            IsReadOnly="True"
-            Text="{Binding UnattendXmlPath, UpdateSourceTrigger=PropertyChanged}" />
+            Text="{Binding AutounattendPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Button
             Grid.Row="1"
             Grid.Column="2"
             Width="100"
-            Height="20"
-            Margin="10,0,0,0"
-            Background="#FF191919"
+            Height="25"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            Background="#FF313131"
             Command="{Binding OpenCommand}"
-            CommandParameter="UnattendXmlPath"
+            CommandParameter="AutounattendPath"
             Content="Öffnen"
             Foreground="#FFD5D5D5"
             Style="{StaticResource DefaultButtonStyle}" />
@@ -120,24 +117,25 @@
             Grid.Column="0"
             HorizontalContentAlignment="Right"
             VerticalContentAlignment="Center"
-            Content="unattend.xml"
+            Content="Autounattend Modus"
             Foreground="#FFD5D5D5" />
         <ComboBox
             Grid.Row="2"
             Grid.Column="1"
-            Width="500"
-            Height="20"
-            SelectedIndex="0">
-            <ComboBoxItem Content="Datei Importieren" />
-            <ComboBoxItem Content="Konfiguration benutzen" />
+            Height="23"
+            Margin="10,0,10,0"
+            SelectedIndex="{Binding AutounattendMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <ComboBoxItem Content="autounattend.xml importieren" />
+            <ComboBoxItem Content="Konfiguration nutzen" />
         </ComboBox>
         <Button
             Grid.Row="2"
             Grid.Column="2"
             Width="100"
-            Height="20"
-            Margin="10,0,0,0"
-            Background="#FF191919"
+            Height="25"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            Background="#FF313131"
             Command="{Binding OpenUnattendConfigCommand}"
             Content="Konfiguration"
             Foreground="#FFD5D5D5"
@@ -149,24 +147,24 @@
             Grid.Column="0"
             HorizontalContentAlignment="Right"
             VerticalContentAlignment="Center"
-            Content="Quell Iso"
+            Content="Quell Iso Pfad"
             Foreground="#FFD5D5D5" />
         <TextBox
             Grid.Row="3"
             Grid.Column="1"
-            Width="500"
             Height="20"
+            Margin="10,0,10,0"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
-            IsReadOnly="True"
-            Text="{Binding SourceIsoPath, UpdateSourceTrigger=PropertyChanged}" />
+            Text="{Binding SourceIsoPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Button
             Grid.Row="3"
             Grid.Column="2"
             Width="100"
-            Height="20"
-            Margin="10,0,0,0"
-            Background="#FF191919"
+            Height="25"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            Background="#FF313131"
             Command="{Binding OpenCommand}"
             CommandParameter="SourceIsoPath"
             Content="Öffnen"
@@ -179,26 +177,26 @@
             Grid.Column="0"
             HorizontalContentAlignment="Right"
             VerticalContentAlignment="Center"
-            Content="Quell Iso Ordner"
+            Content="Extraktions Ordner Pfad"
             Foreground="#FFD5D5D5" />
         <TextBox
             Grid.Row="4"
             Grid.Column="1"
-            Width="500"
             Height="20"
+            Margin="10,0,10,0"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
-            IsReadOnly="True"
-            Text="{Binding SourceIsoDirPath, UpdateSourceTrigger=PropertyChanged}" />
+            Text="{Binding ExtractionPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Button
             Grid.Row="4"
             Grid.Column="2"
             Width="100"
-            Height="20"
-            Margin="10,0,0,0"
-            Background="#FF191919"
+            Height="25"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            Background="#FF313131"
             Command="{Binding OpenCommand}"
-            CommandParameter="SourceIsoDirPath"
+            CommandParameter="ExtractionPath"
             Content="Öffnen"
             Foreground="#FFD5D5D5"
             Style="{StaticResource DefaultButtonStyle}" />
@@ -209,24 +207,24 @@
             Grid.Column="0"
             HorizontalContentAlignment="Right"
             VerticalContentAlignment="Center"
-            Content="Ziel Iso"
+            Content="Ziel Iso Pfad"
             Foreground="#FFD5D5D5" />
         <TextBox
             Grid.Row="5"
             Grid.Column="1"
-            Width="500"
             Height="20"
+            Margin="10,0,10,0"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
-            IsReadOnly="True"
-            Text="{Binding TargetIsoPath, UpdateSourceTrigger=PropertyChanged}" />
+            Text="{Binding TargetIsoPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Button
             Grid.Row="5"
             Grid.Column="2"
             Width="100"
-            Height="20"
-            Margin="10,0,0,0"
-            Background="#FF191919"
+            Height="25"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Left"
+            Background="#FF313131"
             Command="{Binding OpenCommand}"
             CommandParameter="TargetIsoPath"
             Content="Öffnen"
@@ -237,9 +235,10 @@
         <Button
             Grid.Row="6"
             Grid.Column="1"
-            Width="200"
-            Height="30"
-            Background="#FF191919"
+            Width="250"
+            Height="40"
+            Margin="0,0,0,0"
+            Background="#FF313131"
             Command="{Binding CreateCommand}"
             Content="Erstelle Image"
             Foreground="#FFD5D5D5"
@@ -249,7 +248,9 @@
         <TextBox
             x:Name="Log"
             Grid.Row="7"
-            Grid.Column="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="3"
+            Margin="0,20,0,0"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
             IsReadOnly="True"

@@ -2,7 +2,7 @@
 
 namespace UnWin.Models;
 
-public class Settings
+public class AutounattendSettings
 {
     public bool AutoLogonEnabled { get; set; }
 
@@ -20,19 +20,9 @@ public class Settings
 
     public List<LogonCommand> LogonCommands { get; set; }
 
-    public string AutounattendPath { get; set; }
-
     public string ComputerName { get; set; }
 
-    public string ExtractionPath { get; set; }
-
     public string Language { get; set; }
-
-    public string OscdimgPath { get; set; }
-
-    public string SourceIsoPath { get; set; }
-
-    public string TargetIsoPath { get; set; }
 
     public string UserName { get; set; }
 }
