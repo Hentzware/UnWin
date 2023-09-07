@@ -6,66 +6,54 @@ using Prism.Regions;
 using Prism.Services.Dialogs;
 using UnWin.Models;
 using UnWin.Properties;
+using UnWin.Services;
 using UnWin.Views;
 
 namespace UnWin.ViewModels;
 
 public class UnattendViewModel : BindableBase
 {
-    private readonly IRegionManager _regionManager;
     private readonly IDialogService _dialogService;
+    private readonly IRegionManager _regionManager;
     private bool _autoLogonEnabled;
+    private DelegateCommand _navigateBackCommand;
+    private DelegateCommand<string> _openLogonCommandDialog;
     private int _autoLogonCount;
     private int _efiSize;
     private int _osSize;
+    private int _versionIndex;
     private int _winRESize;
     private List<LogonCommand> _firstLogonCommands;
     private List<LogonCommand> _logonCommands;
     private string _computerName;
     private string _language;
     private string _userName;
-    private int _versionIndex;
-    private DelegateCommand _openLogonCommandDialog;
 
-    public DelegateCommand OpenLogonCommandDialog =>
-        _openLogonCommandDialog ?? new DelegateCommand(ExecuteOpenLogonCommandDialog);
-
-    private void ExecuteOpenLogonCommandDialog()
-    {
-        _dialogService.ShowDialog(nameof(LogonCommandDialogView));
-    }
-
-    public int VersionIndex
-    {
-        get => _versionIndex;
-        set
-        {
-            SetProperty(ref _versionIndex, value);
-            Settings.Default.VersionIndex = value;
-            Settings.Default.Save();
-            RaisePropertyChanged();
-        }
-    }
-
-    public UnattendViewModel(IRegionManager regionManager, IDialogService dialogService)
+    public UnattendViewModel(IRegionManager regionManager, IDialogService dialogService, ISettingsService settingsService)
     {
         _regionManager = regionManager;
         _dialogService = dialogService;
-        AutoLogonCount = Settings.Default.AutoLogonCount;
-        AutoLogonEnabled = Settings.Default.AutoLogonEnabled;
-        EFISize = Settings.Default.EFISize;
-        OSSize = Settings.Default.OSSize;
-        WinRESize = Settings.Default.WinRESize;
-        ComputerName = Settings.Default.ComputerName;
-        UserName = Settings.Default.UserName;
-        Language = Settings.Default.Language;
-        VersionIndex = Settings.Default.VersionIndex;
+        AutoLogonCount = Properties.Settings.Default.AutoLogonCount;
+        AutoLogonEnabled = Properties.Settings.Default.AutoLogonEnabled;
+        EFISize = Properties.Settings.Default.EFISize;
+        OSSize = Properties.Settings.Default.OSSize;
+        WinRESize = Properties.Settings.Default.WinRESize;
+        ComputerName = Properties.Settings.Default.ComputerName;
+        UserName = Properties.Settings.Default.UserName;
+        Language = Properties.Settings.Default.Language;
+        VersionIndex = Properties.Settings.Default.VersionIndex;
         FirstLogonCommands = new List<LogonCommand>();
         LogonCommands = new List<LogonCommand>();
 
-        if (!string.IsNullOrEmpty(Settings.Default.FirstLogonCommands))
+        var currentSettings = new Models.Settings();
+        currentSettings.AutoLogonCount = AutoLogonCount;
+        currentSettings.AutoLogonEnabled = AutoLogonEnabled;
+
+        settingsService.Save(currentSettings);
+
+        if (!string.IsNullOrEmpty(Properties.Settings.Default.FirstLogonCommands))
         {
-            var firstLogonCommand = Settings.Default.FirstLogonCommands.Split(';');
+            var firstLogonCommand = Properties.Settings.Default.FirstLogonCommands.Split(';');
 
             foreach (var s in firstLogonCommand)
             {
@@ -83,11 +71,13 @@ public class UnattendViewModel : BindableBase
                     FirstLogonCommands.Add(newCommand);
                 }
             }
+
+            FirstLogonCommands = new List<LogonCommand>(FirstLogonCommands);
         }
 
-        if (!string.IsNullOrEmpty(Settings.Default.LogonCommands))
+        if (!string.IsNullOrEmpty(Properties.Settings.Default.LogonCommands))
         {
-            var logonCommands = Settings.Default.LogonCommands.Split(';');
+            var logonCommands = Properties.Settings.Default.LogonCommands.Split(';');
 
             foreach (var s in logonCommands)
             {
@@ -105,6 +95,8 @@ public class UnattendViewModel : BindableBase
                     LogonCommands.Add(newCommand);
                 }
             }
+
+            LogonCommands = new List<LogonCommand>(LogonCommands);
         }
     }
 
@@ -114,11 +106,17 @@ public class UnattendViewModel : BindableBase
         set
         {
             SetProperty(ref _autoLogonEnabled, value);
-            Settings.Default.AutoLogonEnabled = value;
-            Settings.Default.Save();
+            Properties.Settings.Default.AutoLogonEnabled = value;
+            Properties.Settings.Default.Save();
             RaisePropertyChanged();
         }
     }
+
+    public DelegateCommand NavigateBackCommand =>
+        _navigateBackCommand ?? new DelegateCommand(ExecuteNavigateBackCommand);
+
+    public DelegateCommand<string> OpenLogonCommandDialog =>
+        _openLogonCommandDialog ?? new DelegateCommand<string>(ExecuteOpenLogonCommandDialog);
 
     public int AutoLogonCount
     {
@@ -126,8 +124,8 @@ public class UnattendViewModel : BindableBase
         set
         {
             SetProperty(ref _autoLogonCount, value);
-            Settings.Default.AutoLogonCount = value;
-            Settings.Default.Save();
+            Properties.Settings.Default.AutoLogonCount = value;
+            Properties.Settings.Default.Save();
             RaisePropertyChanged();
         }
     }
@@ -138,8 +136,8 @@ public class UnattendViewModel : BindableBase
         set
         {
             SetProperty(ref _efiSize, value);
-            Settings.Default.EFISize = value;
-            Settings.Default.Save();
+            Properties.Settings.Default.EFISize = value;
+            Properties.Settings.Default.Save();
             RaisePropertyChanged();
         }
     }
@@ -150,8 +148,20 @@ public class UnattendViewModel : BindableBase
         set
         {
             SetProperty(ref _osSize, value);
-            Settings.Default.OSSize = value;
-            Settings.Default.Save();
+            Properties.Settings.Default.OSSize = value;
+            Properties.Settings.Default.Save();
+            RaisePropertyChanged();
+        }
+    }
+
+    public int VersionIndex
+    {
+        get => _versionIndex;
+        set
+        {
+            SetProperty(ref _versionIndex, value);
+            Properties.Settings.Default.VersionIndex = value;
+            Properties.Settings.Default.Save();
             RaisePropertyChanged();
         }
     }
@@ -162,8 +172,8 @@ public class UnattendViewModel : BindableBase
         set
         {
             SetProperty(ref _winRESize, value);
-            Settings.Default.WinRESize = value;
-            Settings.Default.Save();
+            Properties.Settings.Default.WinRESize = value;
+            Properties.Settings.Default.Save();
             RaisePropertyChanged();
         }
     }
@@ -184,8 +194,8 @@ public class UnattendViewModel : BindableBase
                 commands += flc.UserInputRequired + ";";
             }
 
-            Settings.Default.FirstLogonCommands = commands;
-            Settings.Default.Save();
+            Properties.Settings.Default.FirstLogonCommands = commands;
+            Properties.Settings.Default.Save();
             RaisePropertyChanged();
         }
     }
@@ -206,8 +216,8 @@ public class UnattendViewModel : BindableBase
         set
         {
             SetProperty(ref _computerName, value);
-            Settings.Default.ComputerName = value;
-            Settings.Default.Save();
+            Properties.Settings.Default.ComputerName = value;
+            Properties.Settings.Default.Save();
             RaisePropertyChanged();
         }
     }
@@ -218,8 +228,8 @@ public class UnattendViewModel : BindableBase
         set
         {
             SetProperty(ref _language, value);
-            Settings.Default.Language = value;
-            Settings.Default.Save();
+            Properties.Settings.Default.Language = value;
+            Properties.Settings.Default.Save();
             RaisePropertyChanged();
         }
     }
@@ -230,9 +240,39 @@ public class UnattendViewModel : BindableBase
         set
         {
             SetProperty(ref _userName, value);
-            Settings.Default.UserName = value;
-            Settings.Default.Save();
+            Properties.Settings.Default.UserName = value;
+            Properties.Settings.Default.Save();
             RaisePropertyChanged();
         }
+    }
+
+    private void ExecuteNavigateBackCommand()
+    {
+        _regionManager.RequestNavigate("ContentRegion", nameof(ImageView));
+    }
+
+    private void ExecuteOpenLogonCommandDialog(string ctx)
+    {
+        _dialogService.ShowDialog(nameof(LogonCommandDialogView), null, result =>
+        {
+            var cmd = new LogonCommand
+            {
+                Command = result.Parameters.GetValue<string>("Command"),
+                Order = result.Parameters.GetValue<int>("Order"),
+                UserInputRequired = result.Parameters.GetValue<bool>("UserInputRequired")
+            };
+
+            if (result.Result == ButtonResult.Cancel) return;
+
+            if (ctx == "FirstLogon")
+            {
+                FirstLogonCommands.Add(cmd);
+                FirstLogonCommands = new List<LogonCommand>(FirstLogonCommands);
+                return;
+            }
+
+            LogonCommands.Add(cmd);
+            LogonCommands = new List<LogonCommand>(LogonCommands);
+        });
     }
 }

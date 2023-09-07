@@ -200,7 +200,6 @@ namespace UnWin.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public int VersionIndex {
             get {
                 return ((int)(this["VersionIndex"]));

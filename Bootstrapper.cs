@@ -17,6 +17,7 @@ public class Bootstrapper : PrismBootstrapper
     protected override void RegisterTypes(IContainerRegistry containerRegistry)
     {
         containerRegistry.RegisterScoped<IUnattendService, UnattendService>();
+        containerRegistry.RegisterScoped<ISettingsService, SettingsService>();
 
         containerRegistry.RegisterDialog<LogonCommandDialogView, LogonCommandDialogViewModel>();
 

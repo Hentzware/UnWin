@@ -1,32 +1,83 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
 
-namespace UnWin.ViewModels
+namespace UnWin.ViewModels;
+
+public class LogonCommandDialogViewModel : BindableBase, IDialogAware
 {
-    public class LogonCommandDialogViewModel : BindableBase, IDialogAware
+    private bool _userInputRequired;
+    private DelegateCommand<string> _closeCommand;
+    private int _order;
+    private string _command;
+
+    public bool UserInputRequired
     {
-        public bool CanCloseDialog()
+        get => _userInputRequired;
+        set
         {
-            return true;
+            SetProperty(ref _userInputRequired, value);
+            RaisePropertyChanged();
         }
+    }
 
-        public void OnDialogClosed()
+    public DelegateCommand<string> CloseCommand =>
+        _closeCommand ?? new DelegateCommand<string>(ExecuteCloseCommand);
+
+    public int Order
+    {
+        get => _order;
+        set
         {
-            
+            SetProperty(ref _order, value);
+            RaisePropertyChanged();
         }
+    }
 
-        public void OnDialogOpened(IDialogParameters parameters)
+    public string Command
+    {
+        get => _command;
+        set
         {
-            
+            SetProperty(ref _command, value);
+            RaisePropertyChanged();
         }
+    }
 
-        public string Title { get; }
+    public bool CanCloseDialog()
+    {
+        return true;
+    }
 
-        public event Action<IDialogResult>? RequestClose;
+    public void OnDialogClosed()
+    {
+    }
+
+    public void OnDialogOpened(IDialogParameters parameters)
+    {
+    }
+
+    public string Title { get; }
+
+    public event Action<IDialogResult>? RequestClose;
+
+    private void ExecuteCloseCommand(string ctx)
+    {
+        switch (ctx)
+        {
+            case "Save":
+                var dialogResults = new DialogParameters
+                {
+                    { "Command", _command },
+                    { "Order", _order },
+                    { "UserInputRequired", _userInputRequired }
+                };
+                RequestClose?.Invoke(new DialogResult(ButtonResult.OK, dialogResults));
+                break;
+            case "Cancel":
+                RequestClose?.Invoke(new DialogResult(ButtonResult.Cancel));
+                break;
+        }
     }
 }

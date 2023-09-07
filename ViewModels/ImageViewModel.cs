@@ -8,9 +8,12 @@ using DiscUtils.Udf;
 using Microsoft.Win32;
 using Ookii.Dialogs.Wpf;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
-using UnWin.Properties;
+using UnWin.Models;
+using UnWin.PubSubEvents;
+using UnWin.Services;
 using UnWin.Views;
 
 namespace UnWin.ViewModels;
@@ -18,6 +21,8 @@ namespace UnWin.ViewModels;
 public class ImageViewModel : BindableBase
 {
     private readonly IRegionManager _regionManager;
+    private readonly ISettingsService _settingsService;
+    private readonly IEventAggregator _eventAggregator;
     private DelegateCommand _createCommand;
     private DelegateCommand _openUnattendConfigCommand;
     private DelegateCommand<string> _openCommand;
@@ -30,16 +35,29 @@ public class ImageViewModel : BindableBase
     private string _sourceIsoPath;
     private string _targetIsoPath;
     private string _unattendXmlPath;
+    private Settings _settings;
 
-    public ImageViewModel(IRegionManager regionManager)
+    public ImageViewModel(IRegionManager regionManager, ISettingsService settingsService, IEventAggregator eventAggregator)
     {
         _regionManager = regionManager;
-        TargetIsoPath = Settings.Default.TargetIsoPath;
-        UnattendXmlPath = Settings.Default.UnattendXmlPath;
-        OscdimgExeDirPath = Settings.Default.OscdimgExeDirPath;
-        SourceIsoPath = Settings.Default.SourceIsoPath;
-        SourceIsoDirPath = Settings.Default.SourceIsoDirPath;
+        _settingsService = settingsService;
+        _eventAggregator = eventAggregator;
+
+        _eventAggregator.GetEvent<CloseEvent>().Subscribe(OnAppClosing);
+        _settings = _settingsService.Load();
+
+        OscdimgExeDirPath = _settings.OscdimgPath;
+        SourceIsoPath = _settings.SourceIsoPath;
+        SourceIsoDirPath = _settings.SourceIsoPath;
+        TargetIsoPath = _settings.TargetIsoPath;
+        UnattendXmlPath = _settings.AutounattendPath;
     }
+
+    private void OnAppClosing()
+    {
+        _settingsService.Save(_settings);
+    }
+
 
     public DelegateCommand CreateCommand =>
         _createCommand ?? new DelegateCommand(ExecuteCreateCommand);
@@ -69,8 +87,7 @@ public class ImageViewModel : BindableBase
         set
         {
             SetProperty(ref _oscdimgExeDirPath, value);
-            Settings.Default.OscdimgExeDirPath = value;
-            Settings.Default.Save();
+            _settings.OscdimgPath = value;
             RaisePropertyChanged();
         }
     }
@@ -81,8 +98,6 @@ public class ImageViewModel : BindableBase
         set
         {
             SetProperty(ref _sourceIsoDirPath, value);
-            Settings.Default.SourceIsoDirPath = value;
-            Settings.Default.Save();
             RaisePropertyChanged();
         }
     }
@@ -93,8 +108,7 @@ public class ImageViewModel : BindableBase
         set
         {
             SetProperty(ref _sourceIsoPath, value);
-            Settings.Default.SourceIsoPath = value;
-            Settings.Default.Save();
+            _settings.SourceIsoPath = value;
             RaisePropertyChanged();
         }
     }
@@ -105,8 +119,7 @@ public class ImageViewModel : BindableBase
         set
         {
             SetProperty(ref _targetIsoPath, value);
-            Settings.Default.TargetIsoPath = value;
-            Settings.Default.Save();
+            _settings.TargetIsoPath = value;
             RaisePropertyChanged();
         }
     }
@@ -117,8 +130,7 @@ public class ImageViewModel : BindableBase
         set
         {
             SetProperty(ref _unattendXmlPath, value);
-            Settings.Default.UnattendXmlPath = value;
-            Settings.Default.Save();
+            _settings.AutounattendPath = value;
             RaisePropertyChanged();
         }
     }
