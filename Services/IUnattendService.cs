@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace UnWin.Services;
 
-namespace UnWin.Services
+public interface IUnattendService
 {
-    public interface IUnattendService
-    {
-    }
+    void SaveAutounattendXmlFile(string filePath);
 }

@@ -9,11 +9,12 @@
     Width="1000"
     Height="750"
     MinWidth="750"
-    MinHeight="750"
+    MinHeight="800"
     Background="#FF1A1A1D"
     FontFamily="Calibri"
     FontSize="14"
     Foreground="White"
+    ResizeMode="CanResize"
     mc:Ignorable="d">
     <Grid>
         <ContentControl prism:RegionManager.RegionName="ContentRegion" />

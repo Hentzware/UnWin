@@ -21,6 +21,7 @@ public class ImageViewModel : BindableBase
 {
     private readonly IRegionManager _regionManager;
     private readonly ISettingsService _settingsService;
+    private readonly IUnattendService _unattendService;
     private bool _isAutounattendConfigEnabled;
     private bool _isAutounattendImportEnabled;
     private bool _isCreateImageEnabled;
@@ -37,10 +38,11 @@ public class ImageViewModel : BindableBase
     private string _sourceIsoPath;
     private string _targetIsoPath;
 
-    public ImageViewModel(IRegionManager regionManager, ISettingsService settingsService, IEventAggregator eventAggregator)
+    public ImageViewModel(IRegionManager regionManager, ISettingsService settingsService, IEventAggregator eventAggregator, IUnattendService unattendService)
     {
         _regionManager = regionManager;
         _settingsService = settingsService;
+        _unattendService = unattendService;
 
         LoadSettings();
     }
@@ -169,6 +171,12 @@ public class ImageViewModel : BindableBase
         if (File.Exists(xml3))
         {
             File.Delete(xml3);
+        }
+
+        if (_autounattendMode == 1)
+        {
+            _unattendService.SaveAutounattendXmlFile(xml3);
+            return;
         }
 
         File.Copy(_autounattendPath, xml3);
