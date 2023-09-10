@@ -37,6 +37,17 @@ public class ImageViewModel : BindableBase
     private string _oscdimgPath;
     private string _sourceIsoPath;
     private string _targetIsoPath;
+    private string _isCreatingImage = "Hidden";
+
+    public string IsCreatingImage
+    {
+        get => _isCreatingImage;
+        set
+        {
+            SetProperty(ref _isCreatingImage, value);
+            RaisePropertyChanged();
+        }
+    }
 
     public ImageViewModel(IRegionManager regionManager, ISettingsService settingsService, IEventAggregator eventAggregator, IUnattendService unattendService)
     {
@@ -189,11 +200,13 @@ public class ImageViewModel : BindableBase
 
     private async void ExecuteCreateCommand()
     {
+        IsCreatingImage = "Visible";
         await ExtractIso();
         SearchEFIBootFile();
         RemoveBootPrompt();
         ApplyUnattend();
         await CreateImage();
+        IsCreatingImage = "Hidden";
     }
 
     private void ExecuteOnTextChanged(TextBox textBox)
@@ -251,7 +264,7 @@ public class ImageViewModel : BindableBase
 
             using (var outputStream = File.Create(newFilePath))
             {
-                Log += $"Kopiere {file.Name}" + "\n";
+                Log += $"Kopiere {file.Name} nach {outputPath}" + "\n";
                 await fileStream.CopyToAsync(outputStream);
             }
         }

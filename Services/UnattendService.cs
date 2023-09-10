@@ -1,5 +1,9 @@
-﻿using System.Text;
-using System.Xml;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Xml.Serialization;
+using UnWin.Models;
+using XmlSerializer.Models;
 
 namespace UnWin.Services;
 
@@ -14,372 +18,311 @@ public class UnattendService : IUnattendService
 
     public void SaveAutounattendXmlFile(string filePath)
     {
-        var settings = _settingsService.LoadAutounattendSettings();
-        var processorArchitecture = "amd64";
-        var publicKeyToken = "31bf3856ad364e35";
-        var language = "neutral";
-        var versionScope = "nonSxS";
-        var xmlnsWcm = "http://schemas.microsoft.com/WMIConfig/2002/State";
-        var xmlnsXsi = "http://www.w3.org/2001/XMLSchema-instance";
-        
-        var writerSettings = new XmlWriterSettings()
+        var unattend = CreateAutounattendFile();
+        var serializer = new System.Xml.Serialization.XmlSerializer(typeof(Unattend));
+        var types = new Type[] { };
+        var namespaces = new XmlSerializerNamespaces();
+
+        namespaces.Add("wcm", "http://schemas.microsoft.com/WMIConfig/2002/State");
+        namespaces.Add("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+
+        using (var stream = new StreamWriter(filePath))
         {
-            Indent = true,
-            NewLineChars = "\n\r",
-            Encoding = Encoding.UTF8
+            serializer.Serialize(stream, unattend, namespaces);
+        }
+    }
+
+    private Unattend CreateAutounattendFile()
+    {
+        var settings = _settingsService.LoadAutounattendSettings();
+
+        var unattend = new Unattend
+        {
+            Settings = new List<Settings>()
         };
 
-        using (var writer = XmlWriter.Create(filePath, writerSettings))
+
+        // 1. WindowsPE
+
+        var settingWindowsPe = new Settings
         {
-            writer.WriteStartDocument();
-
-            writer.WriteStartElement("unattend", "urn:schemas-microsoft-com:unattend");
-
-            //writer.WriteAttributeString("xmlns", null, "urn:schemas-microsoft-com:unattend");
-
-
-            #region 1. WindowsPE
-
-            writer.WriteStartElement("settings");
-
-            writer.WriteAttributeString("pass", null, "windowsPE");
-
-
-            #region Microsoft-Windows-International-Core-WinPE
-
-            writer.WriteStartElement("component");
-
-            writer.WriteAttributeString("name", null, "Microsoft-Windows-International-Core-WinPE");
-            writer.WriteAttributeString("processorArchitecture", null, processorArchitecture);
-            writer.WriteAttributeString("publicKeyToken", null, publicKeyToken);
-            writer.WriteAttributeString("language", null, language);
-            writer.WriteAttributeString("versionScope", null, versionScope);
-            //writer.WriteAttributeString("xmlns:wcm", null, xmlnsWcm);
-            //writer.WriteAttributeString("xmlns:xsi", null, xmlnsXsi);
-
-            writer.WriteStartElement("SetupUILanguage");
-
-            writer.WriteElementString("UILanguage", settings.Language);
-
-            writer.WriteEndElement(); // SetupUILanguage
-
-            writer.WriteElementString("InputLocale", settings.Language);
-
-            writer.WriteElementString("SystemLocale", settings.Language);
-
-            writer.WriteElementString("UILanguage", settings.Language);
-
-            writer.WriteElementString("UserLocale", settings.Language);
-
-            writer.WriteEndElement(); // component
-
-            #endregion
-
-            #region Microsoft-Windows-Setup
-
-            writer.WriteStartElement("component");
-
-            writer.WriteAttributeString("name", null, "Microsoft-Windows-Setup");
-            writer.WriteAttributeString("processorArchitecture", null, processorArchitecture);
-            writer.WriteAttributeString("publicKeyToken", null, publicKeyToken);
-            writer.WriteAttributeString("language", null, language);
-            writer.WriteAttributeString("versionScope", null, versionScope);
-            //writer.WriteAttributeString("xmlns:wcm", null, xmlnsWcm);
-            //writer.WriteAttributeString("xmlns:xsi", null, xmlnsXsi);
-
-            writer.WriteStartElement("DiskConfiguration");
-
-            writer.WriteStartElement("Disk");
-
-            writer.WriteAttributeString("wcm", "action", "add");
-
-            writer.WriteStartElement("CreatePartitions");
-
-            writer.WriteStartElement("CreatePartition");
-
-            writer.WriteAttributeString("wcm", "action", "add");
-
-            writer.WriteElementString("Order", "1");
-            writer.WriteElementString("Size", settings.EFISize.ToString());
-            writer.WriteElementString("Type", "EFI");
-
-            writer.WriteEndElement(); // CreatePartition
-
-            writer.WriteStartElement("CreatePartition");
-
-            writer.WriteAttributeString("wcm", "action", "add");
-
-            writer.WriteElementString("Order", "2");
-            writer.WriteElementString("Size", settings.OSSize.ToString());
-            writer.WriteElementString("Type", "Primary");
-
-            writer.WriteEndElement(); // CreatePartition
-
-            writer.WriteStartElement("CreatePartition");
-
-            writer.WriteAttributeString("wcm", "action", "add");
-
-            writer.WriteElementString("Order", "3");
-            writer.WriteElementString("Size", settings.WinRESize.ToString());
-            writer.WriteElementString("Type", "Primary");
-
-            writer.WriteEndElement(); // CreatePartition
-
-            writer.WriteEndElement(); // CreatePartitions
-
-            writer.WriteStartElement("ModifyPartitions");
-
-            writer.WriteStartElement("ModifyPartition");
-
-            writer.WriteAttributeString("wcm", "action", "add");
-
-            writer.WriteElementString("Format", "FAT32");
-            writer.WriteElementString("Label", "EFI");
-            writer.WriteElementString("Order", "1");
-            writer.WriteElementString("PartitionID", "1");
-
-            writer.WriteEndElement(); // ModifyPartition
-
-            writer.WriteStartElement("ModifyPartition");
-
-            writer.WriteAttributeString("wcm", "action", "add");
-
-            writer.WriteElementString("Format", "NTFS");
-            writer.WriteElementString("Label", "OS");
-            writer.WriteElementString("Order", "2");
-            writer.WriteElementString("PartitionID", "2");
-
-            writer.WriteEndElement(); // ModifyPartition
-
-            writer.WriteStartElement("ModifyPartition");
-
-            writer.WriteAttributeString("wcm", "action", "add");
-
-            writer.WriteElementString("Format", "NTFS");
-            writer.WriteElementString("Label", "WinRE");
-            writer.WriteElementString("Order", "3");
-            writer.WriteElementString("PartitionID", "3");
-
-            writer.WriteEndElement(); // ModifyPartition
-
-            writer.WriteEndElement(); // ModifyPartitions
-
-            writer.WriteElementString("DiskID", "0");
-            writer.WriteElementString("WillWipeDisk", "true");
-
-            writer.WriteEndElement(); // Disk
-
-            writer.WriteEndElement(); // DiskConfiguration
-
-            writer.WriteStartElement("UserData");
-
-            writer.WriteElementString("AcceptEula", "true");
-
-            writer.WriteEndElement(); // UserData
-
-            writer.WriteStartElement("ImageInstall");
-
-            writer.WriteStartElement("OSImage");
-
-            writer.WriteStartElement("InstallTo");
-
-            writer.WriteElementString("DiskID", "0");
-            writer.WriteElementString("PartitionID", "2");
-
-            writer.WriteEndElement(); // InstallTo
-
-            writer.WriteEndElement(); // OSImage
-
-            writer.WriteEndElement(); // ImageInstall
-
-            writer.WriteEndElement(); // Component
-
-            #endregion
-
-            writer.WriteEndElement(); // Settings
-
-            #endregion
-
-            #region 2. Offline Servicing
-
-            writer.WriteStartElement("settings");
-
-            writer.WriteAttributeString("pass", null, "offlineServicing");
-
-            writer.WriteEndElement();
-
-            #endregion
-
-            #region 3. Generalize
-
-            writer.WriteStartElement("settings");
-
-            writer.WriteAttributeString("pass", null, "generalize");
-
-            writer.WriteEndElement();
-
-            #endregion
-
-            #region 4. Specialize
-
-            writer.WriteStartElement("settings");
-
-            writer.WriteAttributeString("pass", null, "specialize");
-
-            writer.WriteStartElement("component");
-
-            writer.WriteAttributeString("name", null, "Microsoft-Windows-Shell-Setup");
-            writer.WriteAttributeString("processorArchitecture", null, processorArchitecture);
-            writer.WriteAttributeString("publicKeyToken", null, publicKeyToken);
-            writer.WriteAttributeString("language", null, language);
-            writer.WriteAttributeString("versionScope", null, versionScope);
-            //writer.WriteAttributeString("xmlns:wcm", null, xmlnsWcm);
-            //writer.WriteAttributeString("xmlns:xsi", null, xmlnsXsi);
-
-            writer.WriteElementString("ComputerName", settings.ComputerName);
-            writer.WriteElementString("TimeZone", "W. European Standard Time");
-
-            writer.WriteEndElement(); // component
-
-            writer.WriteEndElement(); // settings
-
-            #endregion
-
-            #region 5. Audit System
-
-            writer.WriteStartElement("settings");
-
-            writer.WriteAttributeString("pass", null, "auditSystem");
-
-            writer.WriteEndElement();
-
-            #endregion
-
-            #region 6. Audit User
-
-            writer.WriteStartElement("settings");
-
-            writer.WriteAttributeString("pass", null, "auditUser");
-
-            writer.WriteEndElement();
-
-            #endregion
-
-            #region 7. OOBE System
-
-            writer.WriteStartElement("settings");
-
-            writer.WriteAttributeString("pass", null, "oobeSystem");
-
-            writer.WriteStartElement("component");
-
-            writer.WriteAttributeString("name", null, "Microsoft-Windows-Shell-Setup");
-            writer.WriteAttributeString("processorArchitecture", null, processorArchitecture);
-            writer.WriteAttributeString("publicKeyToken", null, publicKeyToken);
-            writer.WriteAttributeString("language", null, language);
-            writer.WriteAttributeString("versionScope", null, versionScope);
-            //writer.WriteAttributeString("xmlns:wcm", null, xmlnsWcm);
-            //writer.WriteAttributeString("xmlns:xsi", null, xmlnsXsi);
-
-            writer.WriteStartElement("OOBE");
-
-            writer.WriteElementString("HideEULAPage", "true");
-            writer.WriteElementString("HideLocalAccountScreen", "true");
-            writer.WriteElementString("HideOEMRegistrationScreen", "true");
-            writer.WriteElementString("HideOnlineAccountScreens", "true");
-            writer.WriteElementString("HideWirelessSetupInOOBE", "true");
-            writer.WriteElementString("ProtectYourPC", "3");
-
-            writer.WriteEndElement(); // OOBE
-
-            writer.WriteStartElement("UserAccounts");
-
-            writer.WriteStartElement("LocalAccounts");
-
-            writer.WriteStartElement("LocalAccount");
-
-            writer.WriteAttributeString("wcm", "action", "add");
-
-            writer.WriteStartElement("Password");
-
-            writer.WriteElementString("Value", "Passw0rd");
-            writer.WriteElementString("PlainText", "true");
-
-            writer.WriteEndElement(); // Password
-
-            writer.WriteElementString("DisplayName", settings.UserName);
-            writer.WriteElementString("Group", "Administratoren");
-            writer.WriteElementString("Name", settings.UserName);
-
-            writer.WriteEndElement(); // LocalAccount
-
-            writer.WriteEndElement(); // LocalAccounts
-
-            writer.WriteEndElement(); // UserAccounts
-
-            writer.WriteElementString("TimeZone", "W. European Standard Time");
-
-            writer.WriteStartElement("FirstLogonCommands");
+            Pass = "windowsPE",
+            Components = new List<Component>()
+        };
+
+        unattend.Settings.Add(settingWindowsPe);
+
+        var componentWinIntCoreWinPe = new Component
+        {
+            Name = "Microsoft-Windows-International-Core-WinPE",
+            InputLocale = settings.Language,
+            SystemLocale = settings.Language,
+            UILanguage = settings.Language,
+            UserLocale = settings.Language,
+            SetupUILanguage = new SetupUILanguage
+            {
+                UILanguage = settings.Language
+            }
+        };
+
+        settingWindowsPe.Components.Add(componentWinIntCoreWinPe);
+
+        var componentWinSetup = new Component
+        {
+            Name = "Microsoft-Windows-Setup",
+            DiskConfiguration = new DiskConfiguration
+            {
+                Disk = new Disk
+                {
+                    Action = "add",
+                    CreatePartitions = new CreatePartitions
+                    {
+                        CreatePartition = new List<CreatePartition>
+                        {
+                            new()
+                            {
+                                Action = "add",
+                                Order = 1,
+                                Size = settings.EFISize,
+                                Type = "EFI"
+                            },
+                            new()
+                            {
+                                Action = "add",
+                                Order = 2,
+                                Size = settings.OSSize,
+                                Type = "Primary"
+                            },
+                            new()
+                            {
+                                Action = "add",
+                                Order = 3,
+                                Size = settings.WinRESize,
+                                Type = "Primary"
+                            }
+                        }
+                    },
+                    ModifyPartitions = new ModifyPartitions
+                    {
+                        ModifyPartition = new List<ModifyPartition>
+                        {
+                            new()
+                            {
+                                Action = "add",
+                                Order = 1,
+                                Format = "FAT32",
+                                Label = "EFI",
+                                PartitionID = 1
+                            },
+                            new()
+                            {
+                                Action = "add",
+                                Order = 2,
+                                Format = "NTFS",
+                                Label = "OS",
+                                PartitionID = 2
+                            },
+                            new()
+                            {
+                                Action = "add",
+                                Order = 3,
+                                Format = "NTFS",
+                                Label = "WinRE",
+                                PartitionID = 3,
+                                TypeID = "de94bba4-06d1-4d40-a16a-bfd50179d6ac"
+                            }
+                        }
+                    },
+                    DiskId = 0,
+                    WillWipeDisk = true
+                }
+            },
+            ImageInstall = new ImageInstall
+            {
+                OSImage = new OSImage
+                {
+                    InstallTo = new InstallTo
+                    {
+                        DiskID = 0,
+                        PartitionID = 2
+                    },
+                    WillShowUI = "OnError"
+                }
+            },
+            UserData = new UserData
+            {
+                AcceptEula = true
+            }
+        };
+
+        settingWindowsPe.Components.Add(componentWinSetup);
+
+
+        // 4. Specialize
+
+        var settingSpecialize = new Settings
+        {
+            Pass = "specialize",
+            Components = new List<Component>()
+        };
+
+        unattend.Settings.Add(settingSpecialize);
+
+        var componentWinShellSetupSpecialize = new Component
+        {
+            Name = "Microsoft-Windows-Shell-Setup",
+            ComputerName = settings.ComputerName,
+            TimeZone = "W. European Standard Time"
+        };
+
+        settingSpecialize.Components.Add(componentWinShellSetupSpecialize);
+
+
+        // 7. OOBE System
+
+        var settingOobeSystem = new Settings
+        {
+            Pass = "oobeSpecialize",
+            Components = new List<Component>()
+        };
+
+        unattend.Settings.Add(settingOobeSystem);
+
+        var componentWinIntCore = new Component
+        {
+            Name = "Microsoft-Windows-International-Core",
+            InputLocale = settings.Language,
+            SystemLocale = settings.Language,
+            UILanguage = settings.Language,
+            UserLocale = settings.Language
+        };
+
+        settingOobeSystem.Components.Add(componentWinIntCore);
+
+        var componentWinShellSetupOobe = new Component
+        {
+            Name = "Microsoft-Windows-Shell-Setup",
+            OOBE = new OOBE
+            {
+                HideEULAPage = true,
+                HideLocalAccountScreen = true,
+                HideOEMRegistrationScreen = true,
+                HideOnlineAccountScreens = true,
+                HideWirelessSetupInOOBE = true,
+                ProtectYourPC = 3
+            },
+            UserAccounts = new UserAccounts()
+        };
+
+        if (!string.IsNullOrEmpty(settings.AdministratorPassword))
+        {
+            componentWinShellSetupOobe.UserAccounts.AdministratorPassword = new Password()
+            {
+                Value = settings.AdministratorPassword,
+                PlainText = true
+            };
+        }
+
+        if (settings.CreateLocalAccount)
+        {
+            var localAccount = new LocalAccount
+            {
+                Action = "add",
+                Name = settings.Name,
+                DisplayName = settings.DisplayName,
+                Group = settings.Group,
+                Password = new Password
+                {
+                    Value = settings.Password,
+                    PlainText = true
+                }
+            };
+
+            componentWinShellSetupOobe.UserAccounts.LocalAccounts = new LocalAccounts
+            {
+                LocalAccount = localAccount
+            };
+        }
+
+        if (settings.AutoLogonEnabled)
+        {
+            var autoLogon = new AutoLogon
+            {
+                Action = "add",
+                Enabled = true,
+                LogonCount = settings.AutoLogonCount
+            };
+
+            if (settings.CreateLocalAccount)
+            {
+                autoLogon.Password = new Password
+                {
+                    Value = settings.Password,
+                    PlainText = true
+                };
+
+                autoLogon.Username = settings.Name;
+            }
+            else
+            {
+                autoLogon.Password = new Password
+                {
+                    Value = settings.AdministratorPassword,
+                    PlainText = true
+                };
+
+                autoLogon.Username = "administrator";
+            }
+        }
+
+        if (settings.FirstLogonCommands.Count > 0)
+        {
+            var commands = new FirstLogonCommands()
+            {
+                SynchronousCommand = new List<SynchronousCommand>()
+            };
 
             foreach (var firstLogonCommand in settings.FirstLogonCommands)
             {
-                writer.WriteStartElement("SynchronousCommand");
+                var syncCommand = new SynchronousCommand()
+                {
+                    Action = "add",
+                    Order = firstLogonCommand.Order,
+                    CommandLine = firstLogonCommand.Command,
+                    RequiresUserInput = firstLogonCommand.RequiresUserInput
+                };
 
-                writer.WriteAttributeString("wcm", "action", "add");
-
-                writer.WriteElementString("CommandLine", firstLogonCommand.Command);
-                writer.WriteElementString("Order", firstLogonCommand.Order.ToString());
-                writer.WriteElementString("RequiresUserInput", firstLogonCommand.UserInputRequired.ToString());
-
-                writer.WriteEndElement(); // SynchronousCommand
+                commands.SynchronousCommand.Add(syncCommand);
             }
 
-            writer.WriteEndElement(); // FirstLogonCommands
-
-            writer.WriteStartElement("AutoLogon");
-
-            writer.WriteStartElement("Password");
-
-            writer.WriteElementString("Value", "Passw0rd");
-            writer.WriteElementString("PlainText", "true");
-
-            writer.WriteEndElement(); // Password
-
-            writer.WriteEndElement(); // AutoLogon
-
-            writer.WriteEndElement(); // component
-
-            #region Microsoft-Windows-International-Core-WinPE
-
-            writer.WriteStartElement("component");
-
-            writer.WriteAttributeString("name", null, "Microsoft-Windows-International-Core");
-            writer.WriteAttributeString("processorArchitecture", null, processorArchitecture);
-            writer.WriteAttributeString("publicKeyToken", null, publicKeyToken);
-            writer.WriteAttributeString("language", null, language);
-            writer.WriteAttributeString("versionScope", null, versionScope);
-            //writer.WriteAttributeString("xmlns:wcm", null, xmlnsWcm);
-            //writer.WriteAttributeString("xmlns:xsi", null, xmlnsXsi);
-
-            writer.WriteElementString("InputLocale", settings.Language);
-
-            writer.WriteElementString("SystemLocale", settings.Language);
-
-            writer.WriteElementString("UILanguage", settings.Language);
-
-            writer.WriteElementString("UserLocale", settings.Language);
-
-            writer.WriteEndElement(); // component
-
-            #endregion
-
-            writer.WriteEndElement(); // settings
-
-            #endregion
-
-            writer.WriteEndElement(); // unattend
-
-            writer.WriteEndDocument();
+            componentWinShellSetupOobe.FirstLogonCommands = commands;
         }
+
+        if (settings.LogonCommands.Count > 0)
+        {
+            var commands = new LogonCommands()
+            {
+                AsynchronousCommand = new List<AsynchronousCommand>()
+            };
+
+            foreach (var logonCommand in settings.LogonCommands)
+            {
+                var asyncCommand = new AsynchronousCommand()
+                {
+                    Action = "add",
+                    Order = logonCommand.Order,
+                    CommandLine = logonCommand.Command,
+                    RequiresUserInput = logonCommand.RequiresUserInput
+                };
+
+                commands.AsynchronousCommand.Add(asyncCommand);
+            }
+
+            componentWinShellSetupOobe.LogonCommands = commands;
+        }
+
+        settingOobeSystem.Components.Add(componentWinShellSetupOobe);
+
+        return unattend;
     }
 }

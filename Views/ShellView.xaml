@@ -7,16 +7,25 @@
     xmlns:prism="http://prismlibrary.com/"
     Title="UnWin Beta 1.0 - Henning Entz FIAE 12 Damago Berlin"
     Width="1000"
-    Height="750"
-    MinWidth="750"
-    MinHeight="800"
+    Height="1000"
+    MinWidth="500"
+    MinHeight="500"
+    HorizontalAlignment="Stretch"
+    VerticalAlignment="Stretch"
     Background="#FF1A1A1D"
     FontFamily="Calibri"
     FontSize="14"
     Foreground="White"
     ResizeMode="CanResize"
     mc:Ignorable="d">
-    <Grid>
-        <ContentControl prism:RegionManager.RegionName="ContentRegion" />
-    </Grid>
+    <ScrollViewer
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        HorizontalScrollBarVisibility="Auto"
+        VerticalScrollBarVisibility="Auto">
+        <ContentControl
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            prism:RegionManager.RegionName="ContentRegion" />
+    </ScrollViewer>
 </Window>

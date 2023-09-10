@@ -8,9 +8,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\bundy.gif" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\bundy.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="DiscUtils" Version="0.16.13" />
     <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
     <PackageReference Include="Prism.DryIoc" Version="8.1.97" />
+    <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
   </ItemGroup>
 
   <ItemGroup>

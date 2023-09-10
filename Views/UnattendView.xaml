@@ -5,7 +5,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:UnWin.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Height="837"
+    Width="1000"
+    Height="1000"
+    HorizontalAlignment="Stretch"
     VerticalAlignment="Top"
     d:DesignWidth="982.045"
     mc:Ignorable="d">
@@ -35,11 +37,11 @@
             </Setter>
         </Style>
     </UserControl.Resources>
-    <Grid Margin="20,20,20,20">
+    <Grid Margin="20,20,20,-269">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" />
-            <ColumnDefinition Width="1*" MinWidth="200" />
-            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition MinWidth="200" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="50" />
@@ -50,14 +52,19 @@
             <RowDefinition Height="50" />
             <RowDefinition Height="50" />
             <RowDefinition Height="50" />
+            <RowDefinition Height="100" />
+            <RowDefinition Height="100" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
             <RowDefinition Height="50" />
             <RowDefinition Height="100" />
-            <RowDefinition Height="100" />
-            <RowDefinition Height="100" />
+            <RowDefinition />
         </Grid.RowDefinitions>
-
-        <!--  Computername Row 0  -->
         <Label
+            x:Name="lbl_computerName"
             Grid.Row="0"
             Grid.Column="0"
             VerticalAlignment="Center"
@@ -65,6 +72,7 @@
             Content="Computername"
             Foreground="#FFD5D5D5" />
         <TextBox
+            x:Name="txb_computerName"
             Grid.Row="0"
             Grid.Column="1"
             Height="20"
@@ -73,99 +81,104 @@
             Background="#FF191919"
             Foreground="#FFD5D5D5"
             Text="{Binding ComputerName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-        <!--  Benutzername Row 1  -->
         <Label
+            x:Name="lbl_localAccount"
             Grid.Row="1"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            HorizontalContentAlignment="Right"
+            Content="Lokaler Account"
+            Foreground="#FFD5D5D5" />
+        <ComboBox
+            x:Name="cmb_localAccount"
+            Grid.Row="1"
+            Grid.Column="1"
+            Height="23"
+            Margin="10,14,10,13"
+            d:SelectedIndex="0"
+            IsReadOnly="True"
+            SelectedIndex="{Binding CreateLocalAccount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <ComboBoxItem Content="Deaktiviert" />
+            <ComboBoxItem Content="Aktiviert" />
+        </ComboBox>
+        <Label
+            x:Name="lbl_userName"
+            Grid.Row="2"
             Grid.Column="0"
             VerticalAlignment="Center"
             HorizontalContentAlignment="Right"
             Content="Benutzername"
             Foreground="#FFD5D5D5" />
         <TextBox
-            Grid.Row="1"
+            x:Name="txb_userName"
+            Grid.Row="2"
             Grid.Column="1"
             Height="20"
             Margin="10,0,10,0"
             d:Text="user01"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
+            IsEnabled="{Binding CreateLocalAccount, UpdateSourceTrigger=PropertyChanged}"
             Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-        <!--  Lokalisierung Row 2  -->
         <Label
-            Grid.Row="2"
-            Grid.Column="0"
-            VerticalAlignment="Center"
-            HorizontalContentAlignment="Right"
-            Content="Lokalisierung"
-            Foreground="#FFD5D5D5" />
-        <TextBox
-            Grid.Row="2"
-            Grid.Column="1"
-            Height="20"
-            Margin="10,0,10,0"
-            d:Text="de-de"
-            Background="#FF191919"
-            Foreground="#FFD5D5D5"
-            Text="{Binding Language, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-        <!--  EFI Größe Row 3  -->
-        <Label
+            x:Name="lbl_displayName"
             Grid.Row="3"
             Grid.Column="0"
             VerticalAlignment="Center"
             HorizontalContentAlignment="Right"
-            Content="EFI Partition (MB)"
+            Content="Anzeigename"
             Foreground="#FFD5D5D5" />
         <TextBox
+            x:Name="txb_displayName"
             Grid.Row="3"
             Grid.Column="1"
             Height="20"
-            Margin="10,0,10,0"
-            d:Text="100"
+            Margin="10,15,10,15"
+            d:Text="user01"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
-            Text="{Binding EFISize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-        <!--  OS Größe Row 4  -->
+            IsEnabled="{Binding CreateLocalAccount, UpdateSourceTrigger=PropertyChanged}"
+            Text="{Binding DisplayName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Label
+            x:Name="lbl_Password"
             Grid.Row="4"
             Grid.Column="0"
             VerticalAlignment="Center"
             HorizontalContentAlignment="Right"
-            Content="OS Partition (MB)"
+            Content="Passwort"
             Foreground="#FFD5D5D5" />
         <TextBox
+            x:Name="txb_password"
             Grid.Row="4"
             Grid.Column="1"
             Height="20"
-            Margin="10,0,10,0"
-            d:Text="100000"
+            Margin="10,15,10,15"
+            d:Text="user01"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
-            Text="{Binding OSSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-        <!--  RE Größe Row 5  -->
+            IsEnabled="{Binding CreateLocalAccount, UpdateSourceTrigger=PropertyChanged}"
+            Text="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Label
+            x:Name="lbl_adminPassword"
             Grid.Row="5"
             Grid.Column="0"
             VerticalAlignment="Center"
             HorizontalContentAlignment="Right"
-            Content="Recovery Partition (MB)"
+            Content="Administrator Passwort"
             Foreground="#FFD5D5D5" />
         <TextBox
+            x:Name="txb_adminPassword"
             Grid.Row="5"
             Grid.Column="1"
             Height="20"
-            Margin="10,0,10,0"
-            d:Text="1000"
+            Margin="10,15,10,15"
+            d:Text="user01"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
-            Text="{Binding WinRESize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-        <!--  Auto Logon Row 6  -->
+            IsEnabled="{Binding AdministratorPasswordEnabled, UpdateSourceTrigger=PropertyChanged}"
+            Text="{Binding AdministratorPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Label
+            x:Name="lbl_autoLogon"
             Grid.Row="6"
             Grid.Column="0"
             VerticalAlignment="Center"
@@ -173,6 +186,7 @@
             Content="Auto Logon"
             Foreground="#FFD5D5D5" />
         <ComboBox
+            x:Name="cmb_autoLogon"
             Grid.Row="6"
             Grid.Column="1"
             Height="23"
@@ -183,9 +197,8 @@
             <ComboBoxItem Content="Deaktiviert" />
             <ComboBoxItem Content="Aktiviert" />
         </ComboBox>
-
-        <!--  Auto Logon Count Row 7  -->
         <Label
+            x:Name="lbl_logonCount"
             Grid.Row="7"
             Grid.Column="0"
             VerticalAlignment="Center"
@@ -193,6 +206,7 @@
             Content="Logon Count"
             Foreground="#FFD5D5D5" />
         <TextBox
+            x:Name="txb_logonCount"
             Grid.Row="7"
             Grid.Column="1"
             Height="20"
@@ -200,36 +214,19 @@
             d:Text="1"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
+            IsEnabled="{Binding AutoLogonEnabled, UpdateSourceTrigger=PropertyChanged}"
             Text="{Binding AutoLogonCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-        <!--  Version Index Row 8  -->
         <Label
+            x:Name="lbl_firstLogonCommands"
             Grid.Row="8"
-            Grid.Column="0"
-            VerticalAlignment="Center"
-            HorizontalContentAlignment="Right"
-            Content="Version Index"
-            Foreground="#FFD5D5D5" />
-        <TextBox
-            Grid.Row="8"
-            Grid.Column="1"
-            Height="20"
-            Margin="10,0,10,0"
-            d:Text="1"
-            Background="#FF191919"
-            Foreground="#FFD5D5D5"
-            Text="{Binding VersionIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-        <!--  First Logon Commands Row 9  -->
-        <Label
-            Grid.Row="9"
             Grid.Column="0"
             VerticalAlignment="Center"
             HorizontalContentAlignment="Right"
             Content="First Logon Commands"
             Foreground="#FFD5D5D5" />
         <ListBox
-            Grid.Row="9"
+            x:Name="lbx_firstLogonCommands"
+            Grid.Row="8"
             Grid.Column="1"
             Margin="10,10,10,10"
             d:ItemsSource="{d:SampleData ItemCount=5}"
@@ -238,16 +235,18 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Width="70" Text="{Binding Order, StringFormat='{}Order: {0}'}" />
-                        <TextBlock Width="315" Text="{Binding Command, StringFormat='{}Command: {0}'}" />
-                        <TextBlock Width="100" Text="{Binding UserInputRequired, StringFormat='{}Input: {0}'}" />
+                        <TextBlock Width="70" Text="{Binding Order, StringFormat=Order: \{0\}}" />
+                        <TextBlock Width="315" Text="{Binding Command, StringFormat=Command: \{0\}}" />
+                        <TextBlock Width="100" Text="{Binding RequiresUserInput, StringFormat=Input: \{0\}}" />
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
         <StackPanel
-            Grid.Row="9"
+            x:Name="sp_firstLogonCommands"
+            Grid.Row="8"
             Grid.Column="2"
+            Margin="10,0,0,0"
             VerticalAlignment="Center">
             <Button
                 Width="150"
@@ -272,17 +271,17 @@
                 Foreground="#FFD5D5D5"
                 Style="{StaticResource DefaultButtonStyle}" />
         </StackPanel>
-
-        <!--  Logon Commands Row 10  -->
         <Label
-            Grid.Row="10"
+            x:Name="lbl_logonCommands"
+            Grid.Row="9"
             Grid.Column="0"
             VerticalAlignment="Center"
             HorizontalContentAlignment="Right"
             Content="Logon Commands"
             Foreground="#FFD5D5D5" />
         <ListBox
-            Grid.Row="10"
+            x:Name="lbx_logonCommands"
+            Grid.Row="9"
             Grid.Column="1"
             Margin="10,10,10,10"
             d:ItemsSource="{d:SampleData ItemCount=5}"
@@ -291,17 +290,18 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Width="70" Text="{Binding Order, StringFormat='{}Order: {0}'}" />
-                        <TextBlock Width="315" Text="{Binding Command, StringFormat='{}Command: {0}'}" />
-                        <TextBlock Width="100" Text="{Binding UserInputRequired, StringFormat='{}Input: {0}'}" />
+                        <TextBlock Width="70" Text="{Binding Order, StringFormat=Order: \{0\}}" />
+                        <TextBlock Width="315" Text="{Binding Command, StringFormat=Command: \{0\}}" />
+                        <TextBlock Width="100" Text="{Binding RequiresUserInput, StringFormat=Input: \{0\}}" />
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-
         <StackPanel
-            Grid.Row="10"
+            x:Name="sp_logonCommands"
+            Grid.Row="9"
             Grid.Column="2"
+            Margin="10,0,0,0"
             VerticalAlignment="Center">
             <Button
                 Width="150"
@@ -326,9 +326,120 @@
                 Foreground="#FFD5D5D5"
                 Style="{StaticResource DefaultButtonStyle}" />
         </StackPanel>
-
-        <Button
+        <Label
+            x:Name="lbl_versionSelect"
+            Grid.Row="10"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            HorizontalContentAlignment="Right"
+            Content="Versionsauwahl"
+            Foreground="#FFD5D5D5" />
+        <ComboBox
+            x:Name="cmb_versionSelect"
+            Grid.Row="10"
+            Grid.Column="1"
+            Height="23"
+            Margin="10,14,10,14"
+            d:SelectedIndex="0"
+            IsReadOnly="True"
+            SelectedIndex="{Binding VersionIndexEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <ComboBoxItem Content="Deaktiviert" />
+            <ComboBoxItem Content="Aktiviert" />
+        </ComboBox>
+        <Label
+            x:Name="lbl_versionIndex"
             Grid.Row="11"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            HorizontalContentAlignment="Right"
+            Content="Version Index"
+            Foreground="#FFD5D5D5" />
+        <TextBox
+            x:Name="txb_versionIndex"
+            Grid.Row="11"
+            Grid.Column="1"
+            Height="20"
+            Margin="10,0,10,0"
+            d:Text="1"
+            Background="#FF191919"
+            Foreground="#FFD5D5D5"
+            IsEnabled="{Binding VersionIndexEnabled, UpdateSourceTrigger=PropertyChanged}"
+            Text="{Binding VersionIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Label
+            x:Name="lbl_language"
+            Grid.Row="12"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            HorizontalContentAlignment="Right"
+            Content="Lokalisierung"
+            Foreground="#FFD5D5D5" />
+        <TextBox
+            x:Name="txb_language"
+            Grid.Row="12"
+            Grid.Column="1"
+            Height="20"
+            Margin="10,0,10,0"
+            d:Text="de-de"
+            Background="#FF191919"
+            Foreground="#FFD5D5D5"
+            Text="{Binding Language, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Label
+            x:Name="lbl_efiSize"
+            Grid.Row="13"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            HorizontalContentAlignment="Right"
+            Content="EFI Partition (MB)"
+            Foreground="#FFD5D5D5" />
+        <TextBox
+            x:Name="txb_efiSize"
+            Grid.Row="13"
+            Grid.Column="1"
+            Height="20"
+            Margin="10,0,10,0"
+            d:Text="100"
+            Background="#FF191919"
+            Foreground="#FFD5D5D5"
+            Text="{Binding EFISize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Label
+            x:Name="lbl_osSize"
+            Grid.Row="14"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            HorizontalContentAlignment="Right"
+            Content="OS Partition (MB)"
+            Foreground="#FFD5D5D5" />
+        <TextBox
+            x:Name="txb_osSize"
+            Grid.Row="14"
+            Grid.Column="1"
+            Height="20"
+            Margin="10,0,10,0"
+            d:Text="100000"
+            Background="#FF191919"
+            Foreground="#FFD5D5D5"
+            Text="{Binding OSSize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Label
+            x:Name="lbl_winReSize"
+            Grid.Row="15"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            HorizontalContentAlignment="Right"
+            Content="Recovery Partition (MB)"
+            Foreground="#FFD5D5D5" />
+        <TextBox
+            x:Name="txb_winReSize"
+            Grid.Row="15"
+            Grid.Column="1"
+            Height="20"
+            Margin="10,0,10,0"
+            d:Text="1000"
+            Background="#FF191919"
+            Foreground="#FFD5D5D5"
+            Text="{Binding WinRESize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Button
+            x:Name="btn_ok"
+            Grid.Row="16"
             Grid.Column="0"
             Grid.ColumnSpan="3"
             Width="250"

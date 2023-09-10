@@ -13,10 +13,11 @@ namespace UnWin.ViewModels;
 public class UnattendViewModel : BindableBase
 {
     private readonly IDialogService _dialogService;
-    private readonly IEventAggregator _eventAggregator;
     private readonly IRegionManager _regionManager;
     private readonly ISettingsService _settingsService;
     private bool _autoLogonEnabled;
+    private bool _createLocalAccount;
+    private bool _versionIndexEnabled;
     private DelegateCommand _navigateBackCommand;
     private DelegateCommand<string> _deleteLogonCommand;
     private DelegateCommand<string> _openLogonCommandDialog;
@@ -29,20 +30,18 @@ public class UnattendViewModel : BindableBase
     private int _winRESize;
     private List<LogonCommand> _firstLogonCommands;
     private List<LogonCommand> _logonCommands;
+    private string _administratorPassword;
     private string _computerName;
+    private string _displayName;
     private string _language;
+    private string _password;
     private string _userName;
 
-    public UnattendViewModel(
-        IRegionManager regionManager,
-        IDialogService dialogService,
-        ISettingsService settingsService,
-        IEventAggregator eventAggregator)
+    public UnattendViewModel(IRegionManager regionManager, IDialogService dialogService, ISettingsService settingsService)
     {
         _regionManager = regionManager;
         _dialogService = dialogService;
         _settingsService = settingsService;
-        _eventAggregator = eventAggregator;
 
         LoadSettings();
     }
@@ -56,12 +55,37 @@ public class UnattendViewModel : BindableBase
     public DelegateCommand<string> OpenLogonCommandDialog =>
         _openLogonCommandDialog ?? new DelegateCommand<string>(ExecuteOpenLogonCommandDialog);
 
+    public bool AdministratorPasswordEnabled => !_createLocalAccount;
+
     public bool AutoLogonEnabled
     {
         get => _autoLogonEnabled;
         set
         {
             SetProperty(ref _autoLogonEnabled, value);
+            RaisePropertyChanged();
+            SaveSettings();
+        }
+    }
+
+    public bool CreateLocalAccount
+    {
+        get => _createLocalAccount;
+        set
+        {
+            SetProperty(ref _createLocalAccount, value);
+            RaisePropertyChanged();
+            RaisePropertyChanged(nameof(AdministratorPasswordEnabled));
+            SaveSettings();
+        }
+    }
+
+    public bool VersionIndexEnabled
+    {
+        get => _versionIndexEnabled;
+        set
+        {
+            SetProperty(ref _versionIndexEnabled, value);
             RaisePropertyChanged();
             SaveSettings();
         }
@@ -164,6 +188,17 @@ public class UnattendViewModel : BindableBase
         }
     }
 
+    public string AdministratorPassword
+    {
+        get => _administratorPassword;
+        set
+        {
+            SetProperty(ref _administratorPassword, value);
+            RaisePropertyChanged();
+            SaveSettings();
+        }
+    }
+
     public string ComputerName
     {
         get => _computerName;
@@ -175,12 +210,34 @@ public class UnattendViewModel : BindableBase
         }
     }
 
+    public string DisplayName
+    {
+        get => _displayName;
+        set
+        {
+            SetProperty(ref _displayName, value);
+            RaisePropertyChanged();
+            SaveSettings();
+        }
+    }
+
     public string Language
     {
         get => _language;
         set
         {
             SetProperty(ref _language, value);
+            RaisePropertyChanged();
+            SaveSettings();
+        }
+    }
+
+    public string Password
+    {
+        get => _password;
+        set
+        {
+            SetProperty(ref _password, value);
             RaisePropertyChanged();
             SaveSettings();
         }
@@ -234,7 +291,7 @@ public class UnattendViewModel : BindableBase
             {
                 Command = result.Parameters.GetValue<string>("Command"),
                 Order = result.Parameters.GetValue<int>("Order"),
-                UserInputRequired = result.Parameters.GetValue<bool>("UserInputRequired")
+                RequiresUserInput = result.Parameters.GetValue<bool>("RequiresUserInput")
             };
 
             if (result.Result == ButtonResult.Cancel || result.Result == ButtonResult.None)
@@ -266,9 +323,15 @@ public class UnattendViewModel : BindableBase
         Language = autounattendSettings.Language;
         LogonCommands = autounattendSettings.LogonCommands;
         OSSize = autounattendSettings.OSSize;
-        UserName = autounattendSettings.UserName;
+        UserName = autounattendSettings.Name;
         VersionIndex = autounattendSettings.VersionIndex;
         WinRESize = autounattendSettings.WinRESize;
+        VersionIndexEnabled = autounattendSettings.VersionIndexEnabled;
+        CreateLocalAccount = autounattendSettings.CreateLocalAccount;
+        AdministratorPassword = autounattendSettings.AdministratorPassword;
+        Password = autounattendSettings.Password;
+        DisplayName = autounattendSettings.DisplayName;
+        
     }
 
     private void SaveSettings()
@@ -283,9 +346,14 @@ public class UnattendViewModel : BindableBase
             Language = _language,
             LogonCommands = _logonCommands,
             OSSize = _osSize,
-            UserName = _userName,
+            Name = _userName,
             VersionIndex = _versionIndex,
-            WinRESize = _winRESize
+            WinRESize = _winRESize,
+            CreateLocalAccount = _createLocalAccount,
+            VersionIndexEnabled = _versionIndexEnabled,
+            AdministratorPassword = _administratorPassword,
+            Password = _password,
+            DisplayName = _displayName
         };
 
         _settingsService.SaveAutounattendSettings(autounattendSettings);

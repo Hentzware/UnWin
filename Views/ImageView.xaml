@@ -4,9 +4,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:gif="http://wpfanimatedgif.codeplex.com"
     xmlns:interactivity="http://prismlibrary.com/"
     xmlns:local="clr-namespace:UnWin.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Width="1000"
+    Height="1000"
+    HorizontalAlignment="Stretch"
+    VerticalAlignment="Top"
     mc:Ignorable="d">
     <UserControl.Resources>
         <Style x:Key="DefaultButtonStyle" TargetType="Button">
@@ -36,9 +41,9 @@
     </UserControl.Resources>
     <Grid Margin="20,20,20,20">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" />
-            <ColumnDefinition Width="1*" MinWidth="200" />
-            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition MinWidth="200" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="50" />
@@ -48,6 +53,7 @@
             <RowDefinition Height="50" />
             <RowDefinition Height="50" />
             <RowDefinition Height="100" />
+            <RowDefinition Height="350" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -248,17 +254,30 @@
             IsEnabled="{Binding IsCreateImageEnabled, UpdateSourceTrigger=PropertyChanged}"
             Style="{StaticResource DefaultButtonStyle}" />
 
-        <!--  Log Row 7  -->
+        <Image
+            Grid.Row="6"
+            Grid.Column="1"
+            Width="250"
+            MinWidth="250"
+            MaxWidth="250"
+            gif:ImageBehavior.AnimatedSource="/Images/bundy.gif"
+            Stretch="UniformToFill"
+            Visibility="{Binding IsCreatingImage, UpdateSourceTrigger=PropertyChanged}" />
+
         <TextBox
             x:Name="Log"
             Grid.Row="7"
             Grid.Column="0"
             Grid.ColumnSpan="3"
+            Height="300"
+            MinHeight="300"
             Margin="0,20,0,0"
             Background="#FF191919"
             Foreground="#FFD5D5D5"
+            HorizontalScrollBarVisibility="Disabled"
             IsReadOnly="True"
             Text="{Binding Log, UpdateSourceTrigger=PropertyChanged}"
+            TextWrapping="Wrap"
             VerticalScrollBarVisibility="Auto">
             <b:Interaction.Triggers>
                 <b:EventTrigger EventName="TextChanged">

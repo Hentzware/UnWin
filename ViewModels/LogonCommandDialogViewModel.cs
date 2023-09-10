@@ -72,7 +72,7 @@ public class LogonCommandDialogViewModel : BindableBase, IDialogAware
                 {
                     { "Command", _command },
                     { "Order", _order },
-                    { "UserInputRequired", _userInputRequired }
+                    { "RequiresUserInput", _userInputRequired }
                 };
                 RequestClose?.Invoke(new DialogResult(ButtonResult.OK, dialogResults));
                 break;
