@@ -6,7 +6,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:gif="http://wpfanimatedgif.codeplex.com"
     xmlns:interactivity="http://prismlibrary.com/"
-    xmlns:local="clr-namespace:UnWin.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Width="1000"
     Height="1100"
@@ -281,7 +280,8 @@
             VerticalScrollBarVisibility="Auto">
             <b:Interaction.Triggers>
                 <b:EventTrigger EventName="TextChanged">
-                    <interactivity:InvokeCommandAction Command="{Binding OnTextChanged}" CommandParameter="{x:Reference Log}" />
+                    <interactivity:InvokeCommandAction Command="{Binding OnTextChanged}"
+                                                       CommandParameter="{x:Reference Log}" />
                 </b:EventTrigger>
             </b:Interaction.Triggers>
         </TextBox>

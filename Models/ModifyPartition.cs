@@ -5,9 +5,6 @@ namespace XmlSerializer.Models;
 
 public class ModifyPartition
 {
-    [XmlAttribute(Namespace = "http://schemas.microsoft.com/WMIConfig/2002/State", AttributeName = "action", Form = XmlSchemaForm.Qualified)]
-    public string Action { get; set; }
-
     [XmlElement(ElementName = "Format")]
     public string Format { get; set; }
 
@@ -19,6 +16,10 @@ public class ModifyPartition
 
     [XmlElement(ElementName = "PartitionID")]
     public int PartitionID { get; set; }
+
+    [XmlAttribute(Namespace = "http://schemas.microsoft.com/WMIConfig/2002/State", AttributeName = "action", Form = XmlSchemaForm.Qualified)]
+    public string Action { get; set; }
+
 
     [XmlElement(ElementName = "TypeID")]
     public string TypeID { get; set; }

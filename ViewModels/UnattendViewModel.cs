@@ -47,6 +47,15 @@ public class UnattendViewModel : BindableBase
         LoadSettings();
     }
 
+    public DelegateCommand<string> DeleteLogonCommand =>
+        _deleteLogonCommand ?? new DelegateCommand<string>(ExecuteDeleteLogonCommand);
+
+    public DelegateCommand NavigateBackCommand =>
+        _navigateBackCommand ?? new DelegateCommand(ExecuteNavigateBackCommand);
+
+    public DelegateCommand<string> OpenLogonCommandDialog =>
+        _openLogonCommandDialog ?? new DelegateCommand<string>(ExecuteOpenLogonCommandDialog);
+
     public bool AdministratorPasswordEnabled => !_createLocalAccount;
 
     public bool AutoLogonEnabled
@@ -82,15 +91,6 @@ public class UnattendViewModel : BindableBase
             SaveSettings();
         }
     }
-
-    public DelegateCommand NavigateBackCommand =>
-        _navigateBackCommand ?? new DelegateCommand(ExecuteNavigateBackCommand);
-
-    public DelegateCommand<string> DeleteLogonCommand =>
-        _deleteLogonCommand ?? new DelegateCommand<string>(ExecuteDeleteLogonCommand);
-
-    public DelegateCommand<string> OpenLogonCommandDialog =>
-        _openLogonCommandDialog ?? new DelegateCommand<string>(ExecuteOpenLogonCommandDialog);
 
     public int AutoLogonCount
     {
@@ -306,18 +306,27 @@ public class UnattendViewModel : BindableBase
                 RequiresUserInput = result.Parameters.GetValue<bool>("RequiresUserInput")
             };
 
-            if (result.Result == ButtonResult.Cancel || result.Result == ButtonResult.None) return;
+            if (result.Result == ButtonResult.Cancel || result.Result == ButtonResult.None)
+            {
+                return;
+            }
 
             if (ctx == "FirstLogon")
             {
-                if (FirstLogonCommands == null) FirstLogonCommands = new List<LogonCommand>();
+                if (FirstLogonCommands == null)
+                {
+                    FirstLogonCommands = new List<LogonCommand>();
+                }
 
                 FirstLogonCommands.Add(cmd);
                 FirstLogonCommands = new List<LogonCommand>(FirstLogonCommands);
                 return;
             }
 
-            if (LogonCommands == null) LogonCommands = new List<LogonCommand>();
+            if (LogonCommands == null)
+            {
+                LogonCommands = new List<LogonCommand>();
+            }
 
             LogonCommands.Add(cmd);
             LogonCommands = new List<LogonCommand>(LogonCommands);

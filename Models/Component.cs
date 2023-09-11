@@ -26,7 +26,8 @@ public class Component
     [XmlElement(ElementName = "UserAccounts")]
     public UserAccounts UserAccounts { get; set; }
 
-    [XmlElement(ElementName = "TimeZone")] public string TimeZone { get; set; }
+    [XmlElement(ElementName = "TimeZone")]
+    public string TimeZone { get; set; }
 
     [XmlElement(ElementName = "SystemLocale")]
     public string SystemLocale { get; set; }
@@ -46,9 +47,12 @@ public class Component
     [XmlElement(ElementName = "UserLocale")]
     public string UserLocale { get; set; }
 
-    [XmlElement(ElementName = "OOBE")] public OOBE OOBE { get; set; }
+    [XmlElement(ElementName = "OOBE")]
+    public OOBE OOBE { get; set; }
 
-    [XmlElement(ElementName = "UserData")] public UserData UserData { get; set; }
+
+    [XmlElement(ElementName = "UserData")]
+    public UserData UserData { get; set; }
 
     [XmlElement(ElementName = "ComputerName")]
     public string ComputerName { get; set; }
@@ -57,7 +61,8 @@ public class Component
     [XmlAttribute(AttributeName = "language")]
     public string Language { get; set; } = "neutral";
 
-    [XmlAttribute(AttributeName = "name")] public string Name { get; set; }
+    [XmlAttribute(AttributeName = "name")]
+    public string Name { get; set; }
 
     [XmlAttribute(AttributeName = "processorArchitecture")]
     public string ProcessorArchitecture { get; set; } = "amd64";

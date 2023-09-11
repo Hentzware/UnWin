@@ -51,6 +51,18 @@ public class ImageViewModel : BindableBase
         LoadSettings();
     }
 
+    public DelegateCommand CreateCommand =>
+        _createCommand ?? new DelegateCommand(ExecuteCreateCommand);
+
+    public DelegateCommand<TextBox> OnTextChanged =>
+        _onTextChanged ?? new DelegateCommand<TextBox>(ExecuteOnTextChanged);
+
+    public DelegateCommand<string> OpenCommand =>
+        _openCommand ?? new DelegateCommand<string>(ExecuteOpenCommand);
+
+    public DelegateCommand OpenUnattendConfigCommand =>
+        _openUnattendConfigCommand ?? new DelegateCommand(ExecuteOpenUnattendConfigCommand);
+
     public bool IsAutounattendConfigEnabled => _autounattendMode == 1;
 
     public bool IsAutounattendImportEnabled => _autounattendMode == 0;
@@ -64,7 +76,9 @@ public class ImageViewModel : BindableBase
                 string.IsNullOrEmpty(_sourceIsoPath) ||
                 string.IsNullOrEmpty(_extractionPath) ||
                 string.IsNullOrEmpty(_targetIsoPath))
+            {
                 return false;
+            }
 
             return true;
         }
@@ -80,18 +94,6 @@ public class ImageViewModel : BindableBase
             SaveSettings();
         }
     }
-
-    public DelegateCommand CreateCommand =>
-        _createCommand ?? new DelegateCommand(ExecuteCreateCommand);
-
-    public DelegateCommand OpenUnattendConfigCommand =>
-        _openUnattendConfigCommand ?? new DelegateCommand(ExecuteOpenUnattendConfigCommand);
-
-    public DelegateCommand<string> OpenCommand =>
-        _openCommand ?? new DelegateCommand<string>(ExecuteOpenCommand);
-
-    public DelegateCommand<TextBox> OnTextChanged =>
-        _onTextChanged ?? new DelegateCommand<TextBox>(ExecuteOnTextChanged);
 
     public int AutounattendMode
     {
@@ -187,96 +189,6 @@ public class ImageViewModel : BindableBase
         }
     }
 
-    private string SaveFile(SaveFileDialog saveFileDialog)
-    {
-        if (saveFileDialog.ShowDialog() == true) return saveFileDialog.FileName;
-
-        return string.Empty;
-    }
-
-    private string SelectFile(OpenFileDialog openFileDialog)
-    {
-        if (openFileDialog.ShowDialog() == true) return openFileDialog.FileName;
-
-        return string.Empty;
-    }
-
-    private string SelectFolder(VistaFolderBrowserDialog openFolderDialog)
-    {
-        if (openFolderDialog.ShowDialog() == true) return openFolderDialog.SelectedPath;
-
-        return "";
-    }
-
-    private async Task CreateImage()
-    {
-        await RunCommand(
-            $"oscdimg.exe -m -o -h -u2 -udfver102 -b\"{_efisysBinPath}\" -pEF \"{_extractionPath}\" \"{_targetIsoPath}\"");
-    }
-
-    private async Task ExtractDirectory(DiscDirectoryInfo directory, string outputPath)
-    {
-        foreach (var file in directory.GetFiles())
-        {
-            var newFilePath = Path.Combine(outputPath, file.Name);
-
-            Directory.CreateDirectory(Path.GetDirectoryName(newFilePath));
-
-            using (var fileStream = file.OpenRead())
-
-            using (var outputStream = File.Create(newFilePath))
-            {
-                Log += $"Kopiere {file.Name} nach {outputPath}" + "\n";
-                await fileStream.CopyToAsync(outputStream);
-            }
-        }
-
-        foreach (var dir in directory.GetDirectories()) await ExtractDirectory(dir, Path.Combine(outputPath, dir.Name));
-    }
-
-    private async Task ExtractIso()
-    {
-        if (Directory.GetFiles(_extractionPath).Length > 0) return;
-
-        using (var isoStream = File.OpenRead(_sourceIsoPath))
-        {
-            var udf = new UdfReader(isoStream);
-            await ExtractDirectory(udf.Root, _extractionPath);
-        }
-    }
-
-    private async Task RunCommand(string command)
-    {
-        var cmd = new ProcessStartInfo("cmd.exe")
-        {
-            RedirectStandardInput = true,
-            RedirectStandardOutput = true,
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            WorkingDirectory = _oscdimgPath
-        };
-
-        using var process = new Process { StartInfo = cmd, EnableRaisingEvents = true };
-
-        process.OutputDataReceived += (sender, e) =>
-        {
-            if (e.Data != null) Log += e.Data + "\n";
-        };
-
-        process.Start();
-
-        using (var streamWriter = process.StandardInput)
-        {
-            if (streamWriter.BaseStream.CanWrite) streamWriter.WriteLine(command);
-        }
-
-        process.BeginOutputReadLine();
-
-        await process.WaitForExitAsync();
-
-        if (!process.HasExited) process.Kill();
-    }
-
     private void ApplyUnattend()
     {
         var files = new List<string>();
@@ -317,6 +229,12 @@ public class ImageViewModel : BindableBase
         {
             _unattendService.SaveSysprepFile(autounattendFile);
         }
+    }
+
+    private async Task CreateImage()
+    {
+        await RunCommand(
+            $"oscdimg.exe -m -o -h -u2 -udfver102 -b\"{_efisysBinPath}\" -pEF \"{_extractionPath}\" \"{_targetIsoPath}\"");
     }
 
     private void DeleteOldFiles(List<string> files)
@@ -384,6 +302,43 @@ public class ImageViewModel : BindableBase
         _regionManager.RequestNavigate("ContentRegion", nameof(UnattendView));
     }
 
+    private async Task ExtractDirectory(DiscDirectoryInfo directory, string outputPath)
+    {
+        foreach (var file in directory.GetFiles())
+        {
+            var newFilePath = Path.Combine(outputPath, file.Name);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(newFilePath));
+
+            using (var fileStream = file.OpenRead())
+
+            using (var outputStream = File.Create(newFilePath))
+            {
+                Log += $"Kopiere {file.Name} nach {outputPath}" + "\n";
+                await fileStream.CopyToAsync(outputStream);
+            }
+        }
+
+        foreach (var dir in directory.GetDirectories())
+        {
+            await ExtractDirectory(dir, Path.Combine(outputPath, dir.Name));
+        }
+    }
+
+    private async Task ExtractIso()
+    {
+        if (Directory.GetFiles(_extractionPath).Length > 0)
+        {
+            return;
+        }
+
+        using (var isoStream = File.OpenRead(_sourceIsoPath))
+        {
+            var udf = new UdfReader(isoStream);
+            await ExtractDirectory(udf.Root, _extractionPath);
+        }
+    }
+
     private void LoadSettings()
     {
         var imageSettings = _settingsService.LoadImageSettings();
@@ -412,15 +367,81 @@ public class ImageViewModel : BindableBase
         var directory = cdbootEfi.Replace("cdboot.efi", "");
 
 
-        if (!string.IsNullOrEmpty(cdbootEfiPrompt)) return;
+        if (!string.IsNullOrEmpty(cdbootEfiPrompt))
+        {
+            return;
+        }
 
-        if (!string.IsNullOrEmpty(cdbootEfi)) File.Move(cdbootEfi, $"{directory}cdboot_prompt.efi");
+        if (!string.IsNullOrEmpty(cdbootEfi))
+        {
+            File.Move(cdbootEfi, $"{directory}cdboot_prompt.efi");
+        }
 
-        if (!string.IsNullOrEmpty(cdbootEfiNoPrompt)) File.Move(cdbootEfiNoPrompt, $"{directory}cdboot.efi");
+        if (!string.IsNullOrEmpty(cdbootEfiNoPrompt))
+        {
+            File.Move(cdbootEfiNoPrompt, $"{directory}cdboot.efi");
+        }
 
-        if (!string.IsNullOrEmpty(efisysBin)) File.Move(efisysBin, $"{directory}efisys_prompt.bin");
+        if (!string.IsNullOrEmpty(efisysBin))
+        {
+            File.Move(efisysBin, $"{directory}efisys_prompt.bin");
+        }
 
-        if (!string.IsNullOrEmpty(efisysBinNoPrompt)) File.Move(efisysBinNoPrompt, $"{directory}efisys.bin");
+        if (!string.IsNullOrEmpty(efisysBinNoPrompt))
+        {
+            File.Move(efisysBinNoPrompt, $"{directory}efisys.bin");
+        }
+    }
+
+    private async Task RunCommand(string command)
+    {
+        var cmd = new ProcessStartInfo("cmd.exe")
+        {
+            RedirectStandardInput = true,
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            WorkingDirectory = _oscdimgPath
+        };
+
+        using var process = new Process { StartInfo = cmd, EnableRaisingEvents = true };
+
+        process.OutputDataReceived += (sender, e) =>
+        {
+            if (e.Data != null)
+            {
+                Log += e.Data + "\n";
+            }
+        };
+
+        process.Start();
+
+        using (var streamWriter = process.StandardInput)
+        {
+            if (streamWriter.BaseStream.CanWrite)
+            {
+                streamWriter.WriteLine(command);
+            }
+        }
+
+        process.BeginOutputReadLine();
+
+        await process.WaitForExitAsync();
+
+        if (!process.HasExited)
+        {
+            process.Kill();
+        }
+    }
+
+    private string SaveFile(SaveFileDialog saveFileDialog)
+    {
+        if (saveFileDialog.ShowDialog() == true)
+        {
+            return saveFileDialog.FileName;
+        }
+
+        return string.Empty;
     }
 
     private void SaveSettings()
@@ -442,5 +463,25 @@ public class ImageViewModel : BindableBase
     private void SearchEFIBootFile()
     {
         _efisysBinPath = Directory.GetFiles(_extractionPath, "efisys.bin", SearchOption.AllDirectories).First();
+    }
+
+    private string SelectFile(OpenFileDialog openFileDialog)
+    {
+        if (openFileDialog.ShowDialog() == true)
+        {
+            return openFileDialog.FileName;
+        }
+
+        return string.Empty;
+    }
+
+    private string SelectFolder(VistaFolderBrowserDialog openFolderDialog)
+    {
+        if (openFolderDialog.ShowDialog() == true)
+        {
+            return openFolderDialog.SelectedPath;
+        }
+
+        return "";
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Xml.Schema;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 using XmlSerializer.Models;
 
 namespace UnWin.Models;
@@ -14,6 +13,7 @@ public class AutoLogon
 
     [XmlElement(ElementName = "LogonCount")]
     public int LogonCount { get; set; }
+
 
     [XmlElement(ElementName = "Username")]
     public string Username { get; set; }

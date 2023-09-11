@@ -5,9 +5,6 @@ namespace XmlSerializer.Models;
 
 public class Disk
 {
-    [XmlAttribute(Namespace = "http://schemas.microsoft.com/WMIConfig/2002/State", AttributeName = "action", Form = XmlSchemaForm.Qualified)]
-    public string? Action { get; set; }
-
     [XmlElement(ElementName = "CreatePartitions")]
     public CreatePartitions? CreatePartitions { get; set; }
 
@@ -19,4 +16,8 @@ public class Disk
 
     [XmlElement(ElementName = "WillWipeDisk")]
     public bool WillWipeDisk { get; set; }
+
+
+    [XmlAttribute(Namespace = "http://schemas.microsoft.com/WMIConfig/2002/State", AttributeName = "action", Form = XmlSchemaForm.Qualified)]
+    public string? Action { get; set; }
 }

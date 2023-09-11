@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace UnWin.Models
+namespace UnWin.Models;
+
+public class LogonCommands
 {
-    public class LogonCommands
-    {
-        [XmlElement(ElementName = "AsynchronousCommand")]
-        public List<AsynchronousCommand> AsynchronousCommand { get; set; }
-    }
+    [XmlElement(ElementName = "AsynchronousCommand")]
+    public List<AsynchronousCommand> AsynchronousCommand { get; set; }
 }

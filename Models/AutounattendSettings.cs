@@ -24,17 +24,17 @@ public class AutounattendSettings
 
     public List<LogonCommand> LogonCommands { get; set; }
 
+    public string AdministratorPassword { get; set; }
+
     public string ComputerName { get; set; }
 
     public string DisplayName { get; set; }
 
+    public string Group { get; set; }
+
     public string Language { get; set; }
-
-    public string Password { get; set; }
-
-    public string AdministratorPassword { get; set; }
 
     public string Name { get; set; }
 
-    public string Group { get; set; }
+    public string Password { get; set; }
 }

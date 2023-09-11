@@ -11,6 +11,7 @@ public class OSImage
     [XmlElement(ElementName = "InstallFrom")]
     public InstallFrom InstallFrom { get; set; }
 
+
     [XmlElement(ElementName = "WillShowUI")]
     public string WillShowUI { get; set; }
 }

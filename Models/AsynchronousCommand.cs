@@ -14,6 +14,7 @@ public class AsynchronousCommand
     [XmlElement(ElementName = "RequiresUserInput")]
     public bool RequiresUserInput { get; set; }
 
+
     [XmlAttribute(Namespace = "http://schemas.microsoft.com/WMIConfig/2002/State", AttributeName = "action", Form = XmlSchemaForm.Qualified)]
     public string Action { get; set; }
 }

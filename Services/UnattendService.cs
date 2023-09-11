@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml.Linq;
 using System.Xml.Serialization;
 using UnWin.Models;
 using XmlSerializer.Models;
@@ -11,9 +10,9 @@ namespace UnWin.Services;
 
 public class UnattendService : IUnattendService
 {
-    private readonly ISettingsService _settingsService;
     private readonly AutounattendSettings _autounattendSettings;
     private readonly ImageSettings _imageSettings;
+    private readonly ISettingsService _settingsService;
 
     public UnattendService(ISettingsService settingsService)
     {
@@ -165,9 +164,9 @@ public class UnattendService : IUnattendService
             }
         };
 
-        var imageInstall = new ImageInstall()
+        var imageInstall = new ImageInstall
         {
-            OSImage = new OSImage()
+            OSImage = new OSImage
             {
                 InstallTo = new InstallTo
                 {
@@ -184,7 +183,7 @@ public class UnattendService : IUnattendService
         {
             var installFrom = new InstallFrom
             {
-                MetaData = new MetaData()
+                MetaData = new MetaData
                 {
                     Action = "add",
                     Value = settings.VersionIndex,
@@ -256,7 +255,7 @@ public class UnattendService : IUnattendService
 
         if (!string.IsNullOrEmpty(settings.AdministratorPassword))
         {
-            componentWinShellSetupOobe.UserAccounts.AdministratorPassword = new Password()
+            componentWinShellSetupOobe.UserAccounts.AdministratorPassword = new Password
             {
                 Value = settings.AdministratorPassword,
                 PlainText = true
@@ -318,14 +317,14 @@ public class UnattendService : IUnattendService
 
         if (settings.FirstLogonCommands.Count > 0)
         {
-            var commands = new FirstLogonCommands()
+            var commands = new FirstLogonCommands
             {
                 SynchronousCommand = new List<SynchronousCommand>()
             };
 
             foreach (var firstLogonCommand in settings.FirstLogonCommands)
             {
-                var syncCommand = new SynchronousCommand()
+                var syncCommand = new SynchronousCommand
                 {
                     Action = "add",
                     Order = firstLogonCommand.Order,
@@ -341,14 +340,14 @@ public class UnattendService : IUnattendService
 
         if (settings.LogonCommands.Count > 0)
         {
-            var commands = new LogonCommands()
+            var commands = new LogonCommands
             {
                 AsynchronousCommand = new List<AsynchronousCommand>()
             };
 
             foreach (var logonCommand in settings.LogonCommands)
             {
-                var asyncCommand = new AsynchronousCommand()
+                var asyncCommand = new AsynchronousCommand
                 {
                     Action = "add",
                     Order = logonCommand.Order,
@@ -369,25 +368,25 @@ public class UnattendService : IUnattendService
 
     private Unattend CreateSysprepFile()
     {
-        string srcFile = string.Empty;
-        string destFile = string.Empty;
+        var srcFile = string.Empty;
+        var destFile = string.Empty;
 
         var unattend = CreateAutounattendFile();
         var oobe = unattend.Settings.First(x => x.Pass == "oobeSystem");
         var shell = oobe.Components.First(x => x.Name == "Microsoft-Windows-Shell-Setup");
 
-        shell.FirstLogonCommands = new FirstLogonCommands()
+        shell.FirstLogonCommands = new FirstLogonCommands
         {
-            SynchronousCommand = new List<SynchronousCommand>()
+            SynchronousCommand = new List<SynchronousCommand>
             {
-                new SynchronousCommand()
+                new()
                 {
                     Action = "add",
                     Order = 1,
                     CommandLine = "cmd /c copy /Y D:\\autounattend_install.xml C:\\autounattend.xml",
                     RequiresUserInput = false
                 },
-                new SynchronousCommand()
+                new()
                 {
                     Action = "add",
                     Order = 2,

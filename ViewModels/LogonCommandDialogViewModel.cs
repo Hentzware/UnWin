@@ -56,7 +56,6 @@ public class LogonCommandDialogViewModel : BindableBase, IDialogAware
 
     public void OnDialogOpened(IDialogParameters parameters)
     {
-        
     }
 
     public event Action<IDialogResult>? RequestClose;
