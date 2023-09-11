@@ -35,6 +35,9 @@ public class Component
     [XmlElement(ElementName = "ImageInstall")]
     public ImageInstall ImageInstall { get; set; }
 
+    [XmlElement(ElementName = "InstallFrom")]
+    public InstallFrom InstallFrom { get; set; }
+
     [XmlElement(ElementName = "LogonCommands")]
     public LogonCommands LogonCommands { get; set; }
 

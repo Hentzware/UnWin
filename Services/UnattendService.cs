@@ -155,6 +155,21 @@ public class UnattendService : IUnattendService
             }
         };
 
+        if (settings.VersionIndexEnabled)
+        {
+            var installFrom = new InstallFrom
+            {
+                MetaData = new MetaData()
+                {
+                    Action = "add",
+                    Value = settings.VersionIndex,
+                    Key = "/Image/Index"
+                }
+            };
+
+            componentWinSetup.InstallFrom = installFrom;
+        }
+
         settingWindowsPe.Components.Add(componentWinSetup);
 
 
