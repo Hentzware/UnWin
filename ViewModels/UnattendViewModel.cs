@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Prism.Commands;
-using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 using Prism.Services.Dialogs;
@@ -33,11 +32,13 @@ public class UnattendViewModel : BindableBase
     private string _administratorPassword;
     private string _computerName;
     private string _displayName;
+    private string _group;
     private string _language;
     private string _password;
     private string _userName;
 
-    public UnattendViewModel(IRegionManager regionManager, IDialogService dialogService, ISettingsService settingsService)
+    public UnattendViewModel(IRegionManager regionManager, IDialogService dialogService,
+        ISettingsService settingsService)
     {
         _regionManager = regionManager;
         _dialogService = dialogService;
@@ -45,15 +46,6 @@ public class UnattendViewModel : BindableBase
 
         LoadSettings();
     }
-
-    public DelegateCommand<string> DeleteLogonCommand =>
-        _deleteLogonCommand ?? new DelegateCommand<string>(ExecuteDeleteLogonCommand);
-
-    public DelegateCommand NavigateBackCommand =>
-        _navigateBackCommand ?? new DelegateCommand(ExecuteNavigateBackCommand);
-
-    public DelegateCommand<string> OpenLogonCommandDialog =>
-        _openLogonCommandDialog ?? new DelegateCommand<string>(ExecuteOpenLogonCommandDialog);
 
     public bool AdministratorPasswordEnabled => !_createLocalAccount;
 
@@ -90,6 +82,15 @@ public class UnattendViewModel : BindableBase
             SaveSettings();
         }
     }
+
+    public DelegateCommand NavigateBackCommand =>
+        _navigateBackCommand ?? new DelegateCommand(ExecuteNavigateBackCommand);
+
+    public DelegateCommand<string> DeleteLogonCommand =>
+        _deleteLogonCommand ?? new DelegateCommand<string>(ExecuteDeleteLogonCommand);
+
+    public DelegateCommand<string> OpenLogonCommandDialog =>
+        _openLogonCommandDialog ?? new DelegateCommand<string>(ExecuteOpenLogonCommandDialog);
 
     public int AutoLogonCount
     {
@@ -221,6 +222,17 @@ public class UnattendViewModel : BindableBase
         }
     }
 
+    public string Group
+    {
+        get => _group;
+        set
+        {
+            SetProperty(ref _group, value);
+            RaisePropertyChanged();
+            SaveSettings();
+        }
+    }
+
     public string Language
     {
         get => _language;
@@ -294,17 +306,18 @@ public class UnattendViewModel : BindableBase
                 RequiresUserInput = result.Parameters.GetValue<bool>("RequiresUserInput")
             };
 
-            if (result.Result == ButtonResult.Cancel || result.Result == ButtonResult.None)
-            {
-                return;
-            }
+            if (result.Result == ButtonResult.Cancel || result.Result == ButtonResult.None) return;
 
             if (ctx == "FirstLogon")
             {
+                if (FirstLogonCommands == null) FirstLogonCommands = new List<LogonCommand>();
+
                 FirstLogonCommands.Add(cmd);
                 FirstLogonCommands = new List<LogonCommand>(FirstLogonCommands);
                 return;
             }
+
+            if (LogonCommands == null) LogonCommands = new List<LogonCommand>();
 
             LogonCommands.Add(cmd);
             LogonCommands = new List<LogonCommand>(LogonCommands);
@@ -331,7 +344,7 @@ public class UnattendViewModel : BindableBase
         AdministratorPassword = autounattendSettings.AdministratorPassword;
         Password = autounattendSettings.Password;
         DisplayName = autounattendSettings.DisplayName;
-        
+        Group = autounattendSettings.Group;
     }
 
     private void SaveSettings()
@@ -353,7 +366,8 @@ public class UnattendViewModel : BindableBase
             VersionIndexEnabled = _versionIndexEnabled,
             AdministratorPassword = _administratorPassword,
             Password = _password,
-            DisplayName = _displayName
+            DisplayName = _displayName,
+            Group = _group
         };
 
         _settingsService.SaveAutounattendSettings(autounattendSettings);

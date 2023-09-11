@@ -6,8 +6,7 @@
     xmlns:local="clr-namespace:UnWin.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Width="1000"
-    Height="1000"
-    HorizontalAlignment="Stretch"
+    Height="1100"
     VerticalAlignment="Top"
     d:DesignWidth="982.045"
     mc:Ignorable="d">
@@ -37,7 +36,7 @@
             </Setter>
         </Style>
     </UserControl.Resources>
-    <Grid Margin="20,20,20,-269">
+    <Grid Margin="20,20,20,-719">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition MinWidth="200" />
@@ -60,8 +59,9 @@
             <RowDefinition Height="50" />
             <RowDefinition Height="50" />
             <RowDefinition Height="50" />
+            <RowDefinition Height="50" />
             <RowDefinition Height="100" />
-            <RowDefinition />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Label
             x:Name="lbl_computerName"
@@ -439,7 +439,7 @@
             Text="{Binding WinRESize, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Button
             x:Name="btn_ok"
-            Grid.Row="16"
+            Grid.Row="17"
             Grid.Column="0"
             Grid.ColumnSpan="3"
             Width="250"
@@ -450,5 +450,23 @@
             Content="Ok"
             Foreground="#FFD5D5D5"
             Style="{StaticResource DefaultButtonStyle}" />
+        <Label
+            x:Name="lbl_group"
+            Grid.Row="16"
+            Grid.Column="0"
+            VerticalAlignment="Center"
+            HorizontalContentAlignment="Right"
+            Content="Gruppe"
+            Foreground="#FFD5D5D5" />
+        <TextBox
+            x:Name="txb_group"
+            Grid.Row="16"
+            Grid.Column="1"
+            Height="20"
+            Margin="10,15,10,15"
+            d:Text="Administratoren"
+            Background="#FF191919"
+            Foreground="#FFD5D5D5"
+            Text="{Binding Group, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
     </Grid>
 </UserControl>

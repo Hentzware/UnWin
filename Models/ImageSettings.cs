@@ -13,4 +13,6 @@ public class ImageSettings
     public string SourceIsoPath { get; set; }
 
     public string TargetIsoPath { get; set; }
+
+    public bool Sysprep { get; set; }
 }

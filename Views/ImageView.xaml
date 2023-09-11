@@ -9,8 +9,7 @@
     xmlns:local="clr-namespace:UnWin.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Width="1000"
-    Height="1000"
-    HorizontalAlignment="Stretch"
+    Height="1100"
     VerticalAlignment="Top"
     mc:Ignorable="d">
     <UserControl.Resources>
@@ -46,6 +45,7 @@
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
             <RowDefinition Height="50" />
             <RowDefinition Height="50" />
             <RowDefinition Height="50" />
@@ -242,7 +242,7 @@
 
         <!--  Create Image Button Row 6  -->
         <Button
-            Grid.Row="6"
+            Grid.Row="7"
             Grid.Column="1"
             Width="250"
             Height="40"
@@ -255,7 +255,7 @@
             Style="{StaticResource DefaultButtonStyle}" />
 
         <Image
-            Grid.Row="6"
+            Grid.Row="7"
             Grid.Column="1"
             Width="250"
             MinWidth="250"
@@ -266,7 +266,7 @@
 
         <TextBox
             x:Name="Log"
-            Grid.Row="7"
+            Grid.Row="8"
             Grid.Column="0"
             Grid.ColumnSpan="3"
             Height="300"
@@ -285,5 +285,23 @@
                 </b:EventTrigger>
             </b:Interaction.Triggers>
         </TextBox>
+        <Label
+            x:Name="lbl_sysprep"
+            Grid.Row="6"
+            Grid.Column="0"
+            HorizontalContentAlignment="Right"
+            VerticalContentAlignment="Center"
+            Content="Sysprep"
+            Foreground="#FFD5D5D5" />
+        <ComboBox
+            x:Name="cmb_sysprep"
+            Grid.Row="6"
+            Grid.Column="1"
+            Height="23"
+            Margin="10,14,10,14"
+            SelectedIndex="{Binding Sysprep, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <ComboBoxItem Content="Deaktiviert" />
+            <ComboBoxItem Content="Aktiviert" />
+        </ComboBox>
     </Grid>
 </UserControl>

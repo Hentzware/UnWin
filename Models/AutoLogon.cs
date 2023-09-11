@@ -15,9 +15,6 @@ public class AutoLogon
     [XmlElement(ElementName = "LogonCount")]
     public int LogonCount { get; set; }
 
-    [XmlAttribute(Namespace = "http://schemas.microsoft.com/WMIConfig/2002/State", AttributeName = "action", Form = XmlSchemaForm.Qualified)]
-    public string Action { get; set; }
-
     [XmlElement(ElementName = "Username")]
     public string Username { get; set; }
 }

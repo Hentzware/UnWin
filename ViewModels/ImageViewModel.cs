@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,6 +26,7 @@ public class ImageViewModel : BindableBase
     private bool _isAutounattendConfigEnabled;
     private bool _isAutounattendImportEnabled;
     private bool _isCreateImageEnabled;
+    private bool _sysprep;
     private DelegateCommand _createCommand;
     private DelegateCommand _openUnattendConfigCommand;
     private DelegateCommand<string> _openCommand;
@@ -33,23 +35,14 @@ public class ImageViewModel : BindableBase
     private string _autounattendPath;
     private string _efisysBinPath;
     private string _extractionPath;
+    private string _isCreatingImage = "Hidden";
     private string _log;
     private string _oscdimgPath;
     private string _sourceIsoPath;
     private string _targetIsoPath;
-    private string _isCreatingImage = "Hidden";
 
-    public string IsCreatingImage
-    {
-        get => _isCreatingImage;
-        set
-        {
-            SetProperty(ref _isCreatingImage, value);
-            RaisePropertyChanged();
-        }
-    }
-
-    public ImageViewModel(IRegionManager regionManager, ISettingsService settingsService, IEventAggregator eventAggregator, IUnattendService unattendService)
+    public ImageViewModel(IRegionManager regionManager, ISettingsService settingsService,
+        IEventAggregator eventAggregator, IUnattendService unattendService)
     {
         _regionManager = regionManager;
         _settingsService = settingsService;
@@ -57,18 +50,6 @@ public class ImageViewModel : BindableBase
 
         LoadSettings();
     }
-
-    public DelegateCommand CreateCommand =>
-        _createCommand ?? new DelegateCommand(ExecuteCreateCommand);
-
-    public DelegateCommand<TextBox> OnTextChanged =>
-        _onTextChanged ?? new DelegateCommand<TextBox>(ExecuteOnTextChanged);
-
-    public DelegateCommand<string> OpenCommand =>
-        _openCommand ?? new DelegateCommand<string>(ExecuteOpenCommand);
-
-    public DelegateCommand OpenUnattendConfigCommand =>
-        _openUnattendConfigCommand ?? new DelegateCommand(ExecuteOpenUnattendConfigCommand);
 
     public bool IsAutounattendConfigEnabled => _autounattendMode == 1;
 
@@ -83,13 +64,34 @@ public class ImageViewModel : BindableBase
                 string.IsNullOrEmpty(_sourceIsoPath) ||
                 string.IsNullOrEmpty(_extractionPath) ||
                 string.IsNullOrEmpty(_targetIsoPath))
-            {
                 return false;
-            }
 
             return true;
         }
     }
+
+    public bool Sysprep
+    {
+        get => _sysprep;
+        set
+        {
+            SetProperty(ref _sysprep, value);
+            RaisePropertyChanged();
+            SaveSettings();
+        }
+    }
+
+    public DelegateCommand CreateCommand =>
+        _createCommand ?? new DelegateCommand(ExecuteCreateCommand);
+
+    public DelegateCommand OpenUnattendConfigCommand =>
+        _openUnattendConfigCommand ?? new DelegateCommand(ExecuteOpenUnattendConfigCommand);
+
+    public DelegateCommand<string> OpenCommand =>
+        _openCommand ?? new DelegateCommand<string>(ExecuteOpenCommand);
+
+    public DelegateCommand<TextBox> OnTextChanged =>
+        _onTextChanged ?? new DelegateCommand<TextBox>(ExecuteOnTextChanged);
 
     public int AutounattendMode
     {
@@ -126,6 +128,16 @@ public class ImageViewModel : BindableBase
             RaisePropertyChanged();
             RaisePropertyChanged(nameof(IsCreateImageEnabled));
             SaveSettings();
+        }
+    }
+
+    public string IsCreatingImage
+    {
+        get => _isCreatingImage;
+        set
+        {
+            SetProperty(ref _isCreatingImage, value);
+            RaisePropertyChanged();
         }
     }
 
@@ -175,27 +187,147 @@ public class ImageViewModel : BindableBase
         }
     }
 
-    private void ApplyUnattend()
+    private string SaveFile(SaveFileDialog saveFileDialog)
     {
-        var xml3 = Path.Combine(_extractionPath, "autounattend.xml");
+        if (saveFileDialog.ShowDialog() == true) return saveFileDialog.FileName;
 
-        if (File.Exists(xml3))
-        {
-            File.Delete(xml3);
-        }
+        return string.Empty;
+    }
 
-        if (_autounattendMode == 1)
-        {
-            _unattendService.SaveAutounattendXmlFile(xml3);
-            return;
-        }
+    private string SelectFile(OpenFileDialog openFileDialog)
+    {
+        if (openFileDialog.ShowDialog() == true) return openFileDialog.FileName;
 
-        File.Copy(_autounattendPath, xml3);
+        return string.Empty;
+    }
+
+    private string SelectFolder(VistaFolderBrowserDialog openFolderDialog)
+    {
+        if (openFolderDialog.ShowDialog() == true) return openFolderDialog.SelectedPath;
+
+        return "";
     }
 
     private async Task CreateImage()
     {
-        await RunCommand($"oscdimg.exe -m -o -h -u2 -udfver102 -b\"{_efisysBinPath}\" -pEF \"{_extractionPath}\" \"{_targetIsoPath}\"");
+        await RunCommand(
+            $"oscdimg.exe -m -o -h -u2 -udfver102 -b\"{_efisysBinPath}\" -pEF \"{_extractionPath}\" \"{_targetIsoPath}\"");
+    }
+
+    private async Task ExtractDirectory(DiscDirectoryInfo directory, string outputPath)
+    {
+        foreach (var file in directory.GetFiles())
+        {
+            var newFilePath = Path.Combine(outputPath, file.Name);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(newFilePath));
+
+            using (var fileStream = file.OpenRead())
+
+            using (var outputStream = File.Create(newFilePath))
+            {
+                Log += $"Kopiere {file.Name} nach {outputPath}" + "\n";
+                await fileStream.CopyToAsync(outputStream);
+            }
+        }
+
+        foreach (var dir in directory.GetDirectories()) await ExtractDirectory(dir, Path.Combine(outputPath, dir.Name));
+    }
+
+    private async Task ExtractIso()
+    {
+        if (Directory.GetFiles(_extractionPath).Length > 0) return;
+
+        using (var isoStream = File.OpenRead(_sourceIsoPath))
+        {
+            var udf = new UdfReader(isoStream);
+            await ExtractDirectory(udf.Root, _extractionPath);
+        }
+    }
+
+    private async Task RunCommand(string command)
+    {
+        var cmd = new ProcessStartInfo("cmd.exe")
+        {
+            RedirectStandardInput = true,
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            WorkingDirectory = _oscdimgPath
+        };
+
+        using var process = new Process { StartInfo = cmd, EnableRaisingEvents = true };
+
+        process.OutputDataReceived += (sender, e) =>
+        {
+            if (e.Data != null) Log += e.Data + "\n";
+        };
+
+        process.Start();
+
+        using (var streamWriter = process.StandardInput)
+        {
+            if (streamWriter.BaseStream.CanWrite) streamWriter.WriteLine(command);
+        }
+
+        process.BeginOutputReadLine();
+
+        await process.WaitForExitAsync();
+
+        if (!process.HasExited) process.Kill();
+    }
+
+    private void ApplyUnattend()
+    {
+        var files = new List<string>();
+        var autounattendFile = Path.Combine(_extractionPath, "autounattend.xml");
+        var installFile = Path.Combine(_extractionPath, "autounattend_install.xml");
+        var sysprepFile = Path.Combine(_extractionPath, "autounattend_sysprep.xml");
+
+        files.Add(autounattendFile);
+        files.Add(installFile);
+        files.Add(sysprepFile);
+
+        DeleteOldFiles(files);
+
+        if (_autounattendMode == 1)
+        {
+            if (_sysprep)
+            {
+                _unattendService.SaveAutounattendFile(installFile);
+            }
+            else
+            {
+                _unattendService.SaveAutounattendFile(autounattendFile);
+            }
+        }
+        else
+        {
+            if (_sysprep)
+            {
+                File.Copy(_autounattendPath, installFile);
+            }
+            else
+            {
+                File.Copy(_autounattendPath, autounattendFile);
+            }
+        }
+
+        if (_sysprep)
+        {
+            _unattendService.SaveSysprepFile(autounattendFile);
+        }
+    }
+
+    private void DeleteOldFiles(List<string> files)
+    {
+        foreach (var file in files)
+        {
+            if (File.Exists(file))
+            {
+                File.Delete(file);
+            }
+        }
     }
 
     private async void ExecuteCreateCommand()
@@ -252,43 +384,6 @@ public class ImageViewModel : BindableBase
         _regionManager.RequestNavigate("ContentRegion", nameof(UnattendView));
     }
 
-    private async Task ExtractDirectory(DiscDirectoryInfo directory, string outputPath)
-    {
-        foreach (var file in directory.GetFiles())
-        {
-            var newFilePath = Path.Combine(outputPath, file.Name);
-
-            Directory.CreateDirectory(Path.GetDirectoryName(newFilePath));
-
-            using (var fileStream = file.OpenRead())
-
-            using (var outputStream = File.Create(newFilePath))
-            {
-                Log += $"Kopiere {file.Name} nach {outputPath}" + "\n";
-                await fileStream.CopyToAsync(outputStream);
-            }
-        }
-
-        foreach (var dir in directory.GetDirectories())
-        {
-            await ExtractDirectory(dir, Path.Combine(outputPath, dir.Name));
-        }
-    }
-
-    private async Task ExtractIso()
-    {
-        if (Directory.GetFiles(_extractionPath).Length > 0)
-        {
-            return;
-        }
-
-        using (var isoStream = File.OpenRead(_sourceIsoPath))
-        {
-            var udf = new UdfReader(isoStream);
-            await ExtractDirectory(udf.Root, _extractionPath);
-        }
-    }
-
     private void LoadSettings()
     {
         var imageSettings = _settingsService.LoadImageSettings();
@@ -299,6 +394,7 @@ public class ImageViewModel : BindableBase
         AutounattendPath = imageSettings.AutounattendPath;
         AutounattendMode = imageSettings.AutounattendMode;
         ExtractionPath = imageSettings.ExtractionPath;
+        Sysprep = imageSettings.Sysprep;
     }
 
     private void RemoveBootPrompt()
@@ -316,81 +412,15 @@ public class ImageViewModel : BindableBase
         var directory = cdbootEfi.Replace("cdboot.efi", "");
 
 
-        if (!string.IsNullOrEmpty(cdbootEfiPrompt))
-        {
-            return;
-        }
+        if (!string.IsNullOrEmpty(cdbootEfiPrompt)) return;
 
-        if (!string.IsNullOrEmpty(cdbootEfi))
-        {
-            File.Move(cdbootEfi, $"{directory}cdboot_prompt.efi");
-        }
+        if (!string.IsNullOrEmpty(cdbootEfi)) File.Move(cdbootEfi, $"{directory}cdboot_prompt.efi");
 
-        if (!string.IsNullOrEmpty(cdbootEfiNoPrompt))
-        {
-            File.Move(cdbootEfiNoPrompt, $"{directory}cdboot.efi");
-        }
+        if (!string.IsNullOrEmpty(cdbootEfiNoPrompt)) File.Move(cdbootEfiNoPrompt, $"{directory}cdboot.efi");
 
-        if (!string.IsNullOrEmpty(efisysBin))
-        {
-            File.Move(efisysBin, $"{directory}efisys_prompt.bin");
-        }
+        if (!string.IsNullOrEmpty(efisysBin)) File.Move(efisysBin, $"{directory}efisys_prompt.bin");
 
-        if (!string.IsNullOrEmpty(efisysBinNoPrompt))
-        {
-            File.Move(efisysBinNoPrompt, $"{directory}efisys.bin");
-        }
-    }
-
-    private async Task RunCommand(string command)
-    {
-        var cmd = new ProcessStartInfo("cmd.exe")
-        {
-            RedirectStandardInput = true,
-            RedirectStandardOutput = true,
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            WorkingDirectory = _oscdimgPath
-        };
-
-        using var process = new Process { StartInfo = cmd, EnableRaisingEvents = true };
-
-        process.OutputDataReceived += (sender, e) =>
-        {
-            if (e.Data != null)
-            {
-                Log += e.Data + "\n";
-            }
-        };
-
-        process.Start();
-
-        using (var streamWriter = process.StandardInput)
-        {
-            if (streamWriter.BaseStream.CanWrite)
-            {
-                streamWriter.WriteLine(command);
-            }
-        }
-
-        process.BeginOutputReadLine();
-
-        await process.WaitForExitAsync();
-
-        if (!process.HasExited)
-        {
-            process.Kill();
-        }
-    }
-
-    private string SaveFile(SaveFileDialog saveFileDialog)
-    {
-        if (saveFileDialog.ShowDialog() == true)
-        {
-            return saveFileDialog.FileName;
-        }
-
-        return string.Empty;
+        if (!string.IsNullOrEmpty(efisysBinNoPrompt)) File.Move(efisysBinNoPrompt, $"{directory}efisys.bin");
     }
 
     private void SaveSettings()
@@ -402,7 +432,8 @@ public class ImageViewModel : BindableBase
             TargetIsoPath = _targetIsoPath,
             AutounattendPath = _autounattendPath,
             AutounattendMode = _autounattendMode,
-            ExtractionPath = _extractionPath
+            ExtractionPath = _extractionPath,
+            Sysprep = _sysprep
         };
 
         _settingsService.SaveImageSettings(imageSettings);
@@ -411,25 +442,5 @@ public class ImageViewModel : BindableBase
     private void SearchEFIBootFile()
     {
         _efisysBinPath = Directory.GetFiles(_extractionPath, "efisys.bin", SearchOption.AllDirectories).First();
-    }
-
-    private string SelectFile(OpenFileDialog openFileDialog)
-    {
-        if (openFileDialog.ShowDialog() == true)
-        {
-            return openFileDialog.FileName;
-        }
-
-        return string.Empty;
-    }
-
-    private string SelectFolder(VistaFolderBrowserDialog openFolderDialog)
-    {
-        if (openFolderDialog.ShowDialog() == true)
-        {
-            return openFolderDialog.SelectedPath;
-        }
-
-        return "";
     }
 }

@@ -2,5 +2,7 @@
 
 public interface IUnattendService
 {
-    void SaveAutounattendXmlFile(string filePath);
+    void SaveAutounattendFile(string filePath);
+
+    void SaveSysprepFile(string filePath);
 }

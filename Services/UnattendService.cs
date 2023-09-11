@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 using UnWin.Models;
 using XmlSerializer.Models;
@@ -10,13 +12,17 @@ namespace UnWin.Services;
 public class UnattendService : IUnattendService
 {
     private readonly ISettingsService _settingsService;
+    private readonly AutounattendSettings _autounattendSettings;
+    private readonly ImageSettings _imageSettings;
 
     public UnattendService(ISettingsService settingsService)
     {
         _settingsService = settingsService;
+        _autounattendSettings = _settingsService.LoadAutounattendSettings();
+        _imageSettings = _settingsService.LoadImageSettings();
     }
 
-    public void SaveAutounattendXmlFile(string filePath)
+    public void SaveAutounattendFile(string filePath)
     {
         var unattend = CreateAutounattendFile();
         var serializer = new System.Xml.Serialization.XmlSerializer(typeof(Unattend));
@@ -29,6 +35,22 @@ public class UnattendService : IUnattendService
         using (var stream = new StreamWriter(filePath))
         {
             serializer.Serialize(stream, unattend, namespaces);
+        }
+    }
+
+    public void SaveSysprepFile(string filePath)
+    {
+        var sysprep = CreateSysprepFile();
+        var serializer = new System.Xml.Serialization.XmlSerializer(typeof(Unattend));
+        var types = new Type[] { };
+        var namespaces = new XmlSerializerNamespaces();
+
+        namespaces.Add("wcm", "http://schemas.microsoft.com/WMIConfig/2002/State");
+        namespaces.Add("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+
+        using (var stream = new StreamWriter(filePath))
+        {
+            serializer.Serialize(stream, sysprep, namespaces);
         }
     }
 
@@ -137,23 +159,26 @@ public class UnattendService : IUnattendService
                     WillWipeDisk = true
                 }
             },
-            ImageInstall = new ImageInstall
-            {
-                OSImage = new OSImage
-                {
-                    InstallTo = new InstallTo
-                    {
-                        DiskID = 0,
-                        PartitionID = 2
-                    },
-                    WillShowUI = "OnError"
-                }
-            },
             UserData = new UserData
             {
                 AcceptEula = true
             }
         };
+
+        var imageInstall = new ImageInstall()
+        {
+            OSImage = new OSImage()
+            {
+                InstallTo = new InstallTo
+                {
+                    DiskID = 0,
+                    PartitionID = 2
+                },
+                WillShowUI = "OnError"
+            }
+        };
+
+        componentWinSetup.ImageInstall = imageInstall;
 
         if (settings.VersionIndexEnabled)
         {
@@ -167,7 +192,7 @@ public class UnattendService : IUnattendService
                 }
             };
 
-            componentWinSetup.InstallFrom = installFrom;
+            imageInstall.OSImage.InstallFrom = installFrom;
         }
 
         settingWindowsPe.Components.Add(componentWinSetup);
@@ -197,7 +222,7 @@ public class UnattendService : IUnattendService
 
         var settingOobeSystem = new Settings
         {
-            Pass = "oobeSpecialize",
+            Pass = "oobeSystem",
             Components = new List<Component>()
         };
 
@@ -263,7 +288,6 @@ public class UnattendService : IUnattendService
         {
             var autoLogon = new AutoLogon
             {
-                Action = "add",
                 Enabled = true,
                 LogonCount = settings.AutoLogonCount
             };
@@ -288,6 +312,8 @@ public class UnattendService : IUnattendService
 
                 autoLogon.Username = "administrator";
             }
+
+            componentWinShellSetupOobe.AutoLogon = autoLogon;
         }
 
         if (settings.FirstLogonCommands.Count > 0)
@@ -337,6 +363,40 @@ public class UnattendService : IUnattendService
         }
 
         settingOobeSystem.Components.Add(componentWinShellSetupOobe);
+
+        return unattend;
+    }
+
+    private Unattend CreateSysprepFile()
+    {
+        string srcFile = string.Empty;
+        string destFile = string.Empty;
+
+        var unattend = CreateAutounattendFile();
+        var oobe = unattend.Settings.First(x => x.Pass == "oobeSystem");
+        var shell = oobe.Components.First(x => x.Name == "Microsoft-Windows-Shell-Setup");
+
+        shell.FirstLogonCommands = new FirstLogonCommands()
+        {
+            SynchronousCommand = new List<SynchronousCommand>()
+            {
+                new SynchronousCommand()
+                {
+                    Action = "add",
+                    Order = 1,
+                    CommandLine = "cmd /c copy /Y D:\\autounattend_install.xml C:\\autounattend.xml",
+                    RequiresUserInput = false
+                },
+                new SynchronousCommand()
+                {
+                    Action = "add",
+                    Order = 2,
+                    CommandLine = "cmd /c cd C:\\Windows\\System32\\Sysprep && sysprep /oobe /generalize /shutdown /unattend:C:\\autounattend.xml",
+                    RequiresUserInput = false
+                }
+            }
+        };
+        shell.LogonCommands = new LogonCommands();
 
         return unattend;
     }
