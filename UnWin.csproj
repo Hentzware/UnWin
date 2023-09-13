@@ -29,4 +29,10 @@
     <Folder Include="PubSubEvents\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="ReadMe.docx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

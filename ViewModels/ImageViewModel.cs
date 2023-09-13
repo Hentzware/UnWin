@@ -252,7 +252,7 @@ public class ImageViewModel : BindableBase
     {
         IsCreatingImage = "Visible";
         await ExtractIso();
-        SearchEFIBootFile();
+        SearchEfiBootFile();
         RemoveBootPrompt();
         ApplyUnattend();
         await CreateImage();
@@ -460,7 +460,7 @@ public class ImageViewModel : BindableBase
         _settingsService.SaveImageSettings(imageSettings);
     }
 
-    private void SearchEFIBootFile()
+    private void SearchEfiBootFile()
     {
         _efisysBinPath = Directory.GetFiles(_extractionPath, "efisys.bin", SearchOption.AllDirectories).First();
     }
